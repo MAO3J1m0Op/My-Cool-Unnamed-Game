@@ -2,8 +2,6 @@ const discord = require('discord.js')
 
 const auth = require('./auth.json')
 
-const commands = require('./commands')
-
 const bot = new discord.Client();
 bot.login(auth.token)
 
@@ -76,3 +74,27 @@ stdin.addListener('data', function(command) {
         console.log(err)
     }
 })
+
+const commands = {
+    /**
+     * The commands that can only be executed through Discord as the super 
+     * user or through the server console. Indicated with a ##.
+     */
+    sudo: {
+        
+    },
+
+    /**
+     * The commands that any player can execute.
+     */
+    game: {
+
+    },
+
+    /**
+     * The commands that anyone can execute. Indicated with a /.
+     */
+    open: {
+
+    }
+}
