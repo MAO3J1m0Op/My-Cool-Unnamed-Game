@@ -1,5 +1,7 @@
 const discord = require('discord.js')
+
 const auth = require('./auth.json')
+
 const commands = require('./commands')
 
 const bot = new discord.Client();
@@ -63,3 +65,14 @@ function checkRunCommand(msg, denoter, command_obj,
         msg.reply(output)
     }
 }
+
+// Parses sudo commands entered through console
+var stdin = process.openStdin()
+stdin.addListener('data', function(command) {
+    let argv = command.toString().trim().split(' ')
+    try {
+        console.log(commands.sudo[argv[0]](argv, '[console]', null, null))
+    } catch (err) {
+        console.log(err)
+    }
+})
