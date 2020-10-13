@@ -75,13 +75,23 @@ stdin.addListener('data', function(command) {
     }
 })
 
+/**
+ * Releases all of the bot's assets.
+ */
+function onClose() {
+    console.log('Releasing assets.')
+    console.log('All assets released.')
+}
+
 const commands = {
     /**
      * The commands that can only be executed through Discord as the super 
      * user or through the server console. Indicated with a ##.
      */
     sudo: {
-        
+        stop: function() {
+            process.exit(0)
+        }
     },
 
     /**
@@ -98,3 +108,10 @@ const commands = {
 
     }
 }
+
+// Exit protection
+process.on('exit', onClose)
+process.on('SIGINT', () => { console.log("Use 'stop' to exit.") })
+process.on('SIGUSR1', onClose)
+process.on('SIGUSR2', onClose)
+process.on('uncaughtException', onClose)
