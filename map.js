@@ -47,49 +47,34 @@ module.exports.generateMap = function(sizeX, sizeY) {
 }
 
 /**
- * Assigns each player a capital on the map. The function may loop indefinitely
- * if there is inadequate space for all of the capitals.
+ * Sets a position on a map as a player's capital if the position is valid.
  * @param {GridSquare[][]} map the map to assign capitals to.
- * @param {string[]} players the players to assign capitals for.
+ * @param {string} player the players to assign a capital for.
+ * @param {number} x the x position of the new capital.
+ * @param {number} y the y position of the new capital.
+ * @returns {boolean} true if the capital is in a valid position and was
+ * placed, false if the capital's position is invalid.
  */
-module.exports.assignCapitals = async function(map, players) {
-
-    let capitals = []
+module.exports.assignCapital = function(map, player, x, y) {
     
-    // Get size of map
-    let maxX = map.length
+    const distance = 2 // King move limit for capitals
+
+    // Gets the length of the y
+    const lenY = map.map(arr => arr.length).reduce((a, b) => Math.min(a, b))
     
-    // Smallest of the y array
-    let maxY = map.map(arr => arr.length).reduce((a, b) => Math.min(a, b))
+    // Bounds checks
+    const lowX = Math.max(x - distance, 0)
+    const hiX = Math.min(x + distance + 1, map.length)
+    const lowY = Math.max(y - distance, 0)
+    const hiY = Math.min(y + distance + 1, lenY)
 
-    for (let p = 0; p < players.length; ++p) {
-        
-        // Loops until the capital is in a valid position
-        while (true) {
-
-            let x = random.randint(0, maxX)
-            let y = random.randint(0, maxY)
-
-            // Validates position based on each capital.
-            if (capitals.every(c => {
-
-                // Capitals must be at least 2 king-moves away from each other.
-                let distanceX = x - c.x
-                let distanceY = y - c.y
-                return Math.abs(distanceX) > 2 && Math.abs(distanceY) > 2
-
-            })) {
-
-                // All checks pass! The selected x and y value is a capital!
-                capitals.push({ x: x, y: y})
-                break
-            }
-        }
-    }
-
-    // Write the capitals to their squares
-    for (let c = 0; c < capitals.length; ++c) {
-        let coord = capitals[c]
-        map[coord.x][coord.y].capital = players[c]
-    }
+    // Checks the squares at and surrounding the potential capital
+    if (map.slice(lowX, hiX).every(arr => {
+        return arr.slice(lowY, hiY).every(sq => {
+            return sq.capital === null
+        })
+    })) {
+        map[x][y].capital = player
+        return true
+    } else return false
 }
