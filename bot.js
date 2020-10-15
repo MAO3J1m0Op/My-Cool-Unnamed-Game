@@ -55,7 +55,21 @@ async function checkRunCommand(msg, denoter, command_obj,
 
         // Reply with the command's return value.
         msg.reply(await command_obj[argv[0]](argv, sender, guild, channel)
-            .catch(err => "Sorry, I don't understand that command."))
+            .catch(err => {
+                // If it's just an unrecognized command, it's a waste of my time
+                if (command_obj[argv[0]] === undefined) {
+                    return "Sorry, I don't understand that command."
+                } else {
+                    console.log('An error was thrown executing the following:')
+                    console.log('  Command: ' 
+                        + argv.reduce((a, b) => a + ' ' + b))
+                    console.log('  Sender: ' + sender)
+                    console.log('  Guild: ' + guild)
+                    console.log('  Channel: ' + channel)
+                    console.log(err)
+                    return "Something went wrong executing your command."
+                }
+            }))
     }
 }
 
