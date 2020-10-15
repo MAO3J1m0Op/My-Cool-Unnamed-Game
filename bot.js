@@ -30,14 +30,14 @@ bot.on('message', msg => {
  *   sender: discord.User, 
  *   guild: discord.Guild,
  *   channel: discord.Channel
- * ) => void} verification a function called to verify all the conditions
+ * ) => Promise<void>} verification a function called to verify all the conditions
  * required to execute a given type of command. If the function executes 
  * successfully, then the command will be run. If the function throws an
  * error, the error will be printed and the command ignored. If the error 
  * message is "", nothing will be sent and the command will still be ignored.
  */
-function checkRunCommand(msg, denoter, command_obj, 
-    verification = () => {}) {
+async function checkRunCommand(msg, denoter, command_obj, 
+    verification = async () => {}) {
     if (msg.content.startsWith(denoter)) {
         let argv = msg.content.substring(denoter.length).split(' ')
         let sender = msg.author
@@ -45,22 +45,17 @@ function checkRunCommand(msg, denoter, command_obj,
         let channel = msg.channel
         
         // Runs the verification function
-        try {
-            verification(sender, guild, channel)
-        } catch (fail) {
-            msg.reply(fail)
-            return
-        }
+        let verified = true
+        await verification(sender, guild, channel)
+            .catch(fail => {
+                msg.reply(fail)
+                verified = false
+            })
+        if (!verified) return
 
         // Reply with the command's return value.
-        try {
-            output = command_obj[argv[0]](argv, sender, guild, channel)
-        } catch (err) {
-            msg.reply("Sorry, I don't understand that command.")
-            return
-        }
-
-        msg.reply(output)
+        msg.reply(await command_obj[argv[0]](argv, sender, guild, channel)
+            .catch(err => "Sorry, I don't understand that command."))
     }
 }
 
@@ -68,11 +63,8 @@ function checkRunCommand(msg, denoter, command_obj,
 var stdin = process.openStdin()
 stdin.addListener('data', function(command) {
     let argv = command.toString().trim().split(' ')
-    try {
-        console.log(commands.sudo[argv[0]](argv, '[console]', null, null))
-    } catch (err) {
-        console.log(err)
-    }
+    console.log(await commands.sudo[argv[0]](argv, '[console]', null, null)
+        .catch(err => err))
 })
 
 /**
@@ -89,7 +81,7 @@ const commands = {
      * user or through the server console. Indicated with a ##.
      */
     sudo: {
-        stop: function() {
+        stop: async function() {
             process.exit(0)
         }
     },
