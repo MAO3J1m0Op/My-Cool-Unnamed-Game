@@ -39,7 +39,9 @@ module.exports.generateMap = function(sizeX, sizeY) {
     for (let x = 0; x < Math.floor(sizeX); ++x) {
         let row = []
         for (let y = 0; y < Math.floor(sizeY); ++y) {
-            row.push(new GridSquare(random.attribute(module.exports.biomes)))
+            row.push(new GridSquare(
+                module.exports.biomes[random.attribute(module.exports.biomes)]
+            ))
         }
         val.push(row)
     }
