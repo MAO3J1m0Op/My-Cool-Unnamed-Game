@@ -11,7 +11,7 @@ bot.on('ready', () => {
 
 bot.on('message', msg => {
     // sudo commands
-    checkRunCommand(msg, '##', commands.sudo, (sender, guild, channel) => {
+    checkRunCommand(msg, '##', commands.sudo, async (sender, guild, channel) => {
 
         // The sender must be the "super user".
         if (sender.id !== auth.super_user)
@@ -25,7 +25,7 @@ bot.on('message', msg => {
  * as a command.
  * @param {string} denoter the text used to verify that the text sent is
  * a command.
- * @param {*} command_obj the object containing the command lookup.
+ * @param {{[command: string]: () => Promise<string>}} command_obj the object containing the command lookup.
  * @param {(
  *   sender: discord.User, 
  *   guild: discord.Guild,
@@ -46,7 +46,7 @@ async function checkRunCommand(msg, denoter, command_obj,
         
         // Runs the verification function
         let verified = true
-        await verification(sender, guild, channel)
+        await Promise.resolve(verification(sender, guild, channel))
             .catch(fail => {
                 msg.reply(fail)
                 verified = false
