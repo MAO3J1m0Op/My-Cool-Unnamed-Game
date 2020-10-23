@@ -53,8 +53,9 @@ async function checkRunCommand(msg, denoter, command_obj,
             })
         if (!verified) return
 
+        let id = command_obj[argv[0]]
         // Reply with the command's return value.
-        msg.reply(await command_obj[argv[0]](argv, sender, guild, channel)
+        msg.reply(await Promise.resolve(id(argv, sender, guild, channel))
             .catch(err => {
                 // If it's just an unrecognized command, it's a waste of my time
                 if (command_obj[argv[0]] === undefined) {
@@ -69,15 +70,17 @@ async function checkRunCommand(msg, denoter, command_obj,
                     console.log(err)
                     return "Something went wrong executing your command."
                 }
-            }))
+            })
+        )
     }
 }
 
 // Parses sudo commands entered through console
 var stdin = process.openStdin()
-stdin.addListener('data', function(command) {
+stdin.addListener('data', async function(command) {
     let argv = command.toString().trim().split(' ')
-    console.log(await commands.sudo[argv[0]](argv, '[console]', null, null)
+    let id = commands.sudo[argv[0]]
+    console.log(Promise.resolve(await id(argv, '[console]', null, null))
         .catch(err => err))
 })
 
@@ -120,4 +123,3 @@ process.on('exit', onClose)
 process.on('SIGINT', () => { console.log("Use 'stop' to exit.") })
 process.on('SIGUSR1', onClose)
 process.on('SIGUSR2', onClose)
-process.on('uncaughtException', onClose)
