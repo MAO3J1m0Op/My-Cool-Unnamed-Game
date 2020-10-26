@@ -45,40 +45,47 @@ async function checkRunCommand(msg, denoter, command_obj,
         let channel = msg.channel
         
         // Runs the verification function
-        let verified = true
-        await verification(sender, guild, channel)
-            .catch(fail => {
-                msg.reply(fail)
-                verified = false
-            })
-        if (!verified) return
+        try {
+            await verification(sender, guild, channel)
+        } catch (fail) {
+            msg.reply(fail)
+            return
+        }
 
         // Reply with the command's return value.
-        msg.reply(await command_obj[argv[0]](argv, sender, guild, channel)
-            .catch(err => {
-                // If it's just an unrecognized command, it's a waste of my time
-                if (command_obj[argv[0]] === undefined) {
-                    return "Sorry, I don't understand that command."
-                } else {
-                    console.log('An error was thrown executing the following:')
-                    console.log('  Command: ' 
-                        + argv.reduce((a, b) => a + ' ' + b))
-                    console.log('  Sender: ' + sender)
-                    console.log('  Guild: ' + guild)
-                    console.log('  Channel: ' + channel)
-                    console.log(err)
-                    return "Something went wrong executing your command."
-                }
-            }))
+        let output
+        try {
+            output = await command_obj[argv[0]](argv, sender, guild, channel)
+        } catch (err) {
+            if (command_obj[argv[0]] === undefined) {
+                output = "Sorry, I don't understand that command."
+            } else {
+                console.log('An error was thrown executing the following:')
+                console.log('  Command: ' 
+                    + argv.reduce((a, b) => a + ' ' + b))
+                console.log('  Sender: ' + sender)
+                console.log('  Guild: ' + guild)
+                console.log('  Channel: ' + channel)
+                console.log(err)
+                output = "Something went wrong executing your command."
+            }
+        }
+
+        msg.reply(output)
     }
 }
 
 // Parses sudo commands entered through console
 var stdin = process.openStdin()
-stdin.addListener('data', function(command) {
+stdin.addListener('data', async function(command) {
     let argv = command.toString().trim().split(' ')
-    console.log(await commands.sudo[argv[0]](argv, '[console]', null, null)
-        .catch(err => err))
+    let output
+    try {
+        output = await commands.sudo[argv[0]](argv, '[console]', null, null)
+    } catch (err) {
+        output = err
+    }
+    console.log(output)
 })
 
 /**
@@ -95,7 +102,7 @@ const commands = {
      * user or through the server console. Indicated with a ##.
      */
     sudo: {
-        stop: async function() {
+        stop: function() {
             process.exit(0)
         }
     },
@@ -120,4 +127,3 @@ process.on('exit', onClose)
 process.on('SIGINT', () => { console.log("Use 'stop' to exit.") })
 process.on('SIGUSR1', onClose)
 process.on('SIGUSR2', onClose)
-process.on('uncaughtException', onClose)
