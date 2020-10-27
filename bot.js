@@ -124,6 +124,6 @@ const commands = {
 
 // Exit protection
 process.on('exit', onClose)
-process.on('SIGINT', () => { console.log("Use 'stop' to exit.") })
+process.on('SIGINT', () => { console.log("\nUse 'stop' to exit.") })
 process.on('SIGUSR1', onClose)
 process.on('SIGUSR2', onClose)
