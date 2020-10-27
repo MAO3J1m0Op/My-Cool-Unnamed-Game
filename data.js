@@ -1,4 +1,5 @@
 const fs = require('fs')
+const discord = require('discord.js')
 
 const map = require('./map.js')
 
@@ -11,16 +12,23 @@ async function writeJSON(path, obj) {
     fs.writeFile(path, JSON.stringify(obj, null, 4))
 }
 
-var currentMap
-
-module.exports.map = {
-    get: function() {
-        return currentMap
-    },
+class SeasonData {
     /**
-     * @param {map.GridSquare[][]} mp
+     * @param {map.GridSquare[][]} map 
+     * @param {string} parentCategory 
+     * @param {string} channelSignin 
      */
-    set: function(mp) {
-        currentMap = mp
+    constructor(map, parentCategory, channelSignin) {
+        this.map = map
+        this.channels = {
+            parent: parentCategory,
+            signin: channelSignin,
+        }
     }
+}
+
+const data = new SeasonData()
+
+module.exports = function() {
+    return data
 }

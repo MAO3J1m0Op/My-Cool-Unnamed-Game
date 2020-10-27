@@ -25,7 +25,7 @@ module.exports = {
         }
 
         // Generate a new map.
-        data.map.set(map.generateMap(30, 30))
+        data().map = map.generateMap(30, 30)
 
         // let category = await guild.channels.create('Game', { 
         //     type: 'category', 
