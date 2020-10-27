@@ -39,7 +39,7 @@ module.exports.GridSquare = GridSquare
  * @param {number} sizeY
  * @returns {Promise<GridSquare[][]>} a promise to the completed biome map.
  */
-module.exports.generateMap = function(sizeX, sizeY) {
+module.exports.generateMap = async function(sizeX, sizeY) {
     let val = []
     for (let x = 0; x < Math.floor(sizeX); ++x) {
         let row = []
