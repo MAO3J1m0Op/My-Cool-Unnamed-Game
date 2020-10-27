@@ -70,8 +70,13 @@ async function checkRunCommand(msg, denoter, command_obj,
                 output = "Something went wrong executing your command."
             }
         }
-
-        msg.reply(output)
+        try {
+            msg.reply(output)
+        } catch (err) {
+            console.error(err)
+            msg.reply('The command was executed, '
+                + 'but there was an error sending the message.')
+        }
     }
 }
 
