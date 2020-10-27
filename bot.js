@@ -70,6 +70,10 @@ async function checkRunCommand(msg, denoter, command_obj,
                 output = "Something went wrong executing your command."
             }
         }
+
+        // Checks if output is undefined, null, or anything else Discord doesn't like.
+        // Just an indication that the command was done.
+        if (!output) output = 'Done!'
         
         msg.reply(output).catch(err => {
             console.error(err)
