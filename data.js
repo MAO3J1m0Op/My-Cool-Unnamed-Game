@@ -29,6 +29,6 @@ class SeasonData {
 
 const data = new SeasonData()
 
-module.exports = function() {
+module.exports.get = function() {
     return data
 }

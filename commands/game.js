@@ -17,7 +17,7 @@ module.exports = {
         }
 
         if (request == 'map') {
-            return map.render(data().map)
+            return map.render(data.get().map)
         }
     })
 }
