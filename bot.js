@@ -1,5 +1,6 @@
 const discord = require('discord.js')
 
+const commands = require('./commands.js')
 const auth = require('./auth.json')
 
 const bot = new discord.Client();
@@ -39,7 +40,7 @@ bot.on('message', msg => {
  * as a command.
  * @param {string} denoter the text used to verify that the text sent is
  * a command.
- * @param {*} command_obj the object containing the command lookup.
+ * @param {{[command: string]: commands.Command}} command_obj the object containing the command lookup.
  * @param {(
  *   sender: discord.User, 
  *   guild: discord.Guild,
@@ -69,7 +70,7 @@ async function checkRunCommand(msg, denoter, command_obj,
         // Reply with the command's return value.
         let output
         try {
-            output = await command_obj[argv[0]](argv, sender, guild, channel)
+            output = await command_obj[argv[0]].execute(argv, sender, guild, channel)
         } catch (err) {
             if (command_obj[argv[0]] === undefined) {
                 output = "Sorry, I don't understand that command."
@@ -103,7 +104,7 @@ stdin.addListener('data', async function(command) {
     let argv = command.toString().trim().split(' ')
     let output
     try {
-        output = await commands.sudo[argv[0]](argv, '[console]', null, null)
+        output = await commands.sudo[argv[0]].execute(argv, '[console]', null, null)
     } catch (err) {
         output = err
     }
@@ -117,7 +118,6 @@ function onClose() {
     console.log('Releasing assets.')
     console.log('All assets released.')
 }
-
 
 // Exit protection
 process.on('exit', onClose)
