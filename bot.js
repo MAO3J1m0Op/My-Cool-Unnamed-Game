@@ -17,6 +17,20 @@ bot.on('message', msg => {
         if (sender.id !== auth.super_user)
             throw ('You are not the super user!')
     })
+
+    // server admin commands
+    checkRunCommand(msg, '!', commands.server_admin, async (sender, guild, channel) => {
+
+        // The sender must be a server admin
+        let authorAsMember = await guild.members.fetch(sender.id)
+        if (authorAsMember === undefined) throw '"guild" is undefined.'
+        
+        if (!authorAsMember.hasPermission('ADMINISTRATOR'))
+            throw 'You must be a server administrator to run this command.'
+    })
+
+    // Game commands
+    checkRunCommand(msg, '/', commands.game) 
 })
 
 /**
@@ -104,31 +118,6 @@ function onClose() {
     console.log('All assets released.')
 }
 
-const commands = {
-    /**
-     * The commands that can only be executed through Discord as the super 
-     * user or through the server console. Indicated with a ##.
-     */
-    sudo: {
-        stop: function() {
-            process.exit(0)
-        }
-    },
-
-    /**
-     * The commands that any player can execute.
-     */
-    game: {
-
-    },
-
-    /**
-     * The commands that anyone can execute. Indicated with a /.
-     */
-    open: {
-
-    }
-}
 
 // Exit protection
 process.on('exit', onClose)

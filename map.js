@@ -3,16 +3,21 @@ const random = require('./random')
 class Biome {
     /**
      * @param {string} name the name of the biome.
+     * @param {string} emoji the emoji that represents a tile of this biome.
      */
-    constructor(name) {
+    constructor(name, emoji) {
         this.name = name
+        this.emoji = emoji
+    }
+    toString() {
+        return this.name
     }
 }
 module.exports.Biome = Biome
 
 module.exports.biomes = {
-    forest: new Biome('forest'),
-    desert: new Biome('desert')
+    forest: new Biome('forest', ':green_square:'),
+    desert: new Biome('desert', ':yellow_square:')
 }
 
 class GridSquare {
@@ -46,6 +51,18 @@ module.exports.generateMap = function(sizeX, sizeY) {
         val.push(row)
     }
     return val
+}
+
+/**
+ * Converts a map into a string of emojis to render the map for Discord.
+ * @param {GridSquare[][]} map the map to render.
+ */
+module.exports.render = function(map) {
+    return map.reduce((x0, x) => {
+        return x0 + x.reduce((y0, y) => {
+            return y0 + '\\' + y.biome.emoji
+        }, '') + '\n'
+    }, '')
 }
 
 /**
