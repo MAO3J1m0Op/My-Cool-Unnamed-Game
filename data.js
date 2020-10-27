@@ -17,12 +17,14 @@ class SeasonData {
      * @param {map.GridSquare[][]} map 
      * @param {string} parentCategory 
      * @param {string} channelSignin 
+     * @param {string} playerRole
      */
-    constructor(map, parentCategory, channelSignin) {
+    constructor(map, parentCategory, channelSignups, playerRole) {
         this.map = map
+        this.playerRole = playerRole
         this.channels = {
             parent: parentCategory,
-            signin: channelSignin,
+            signups: channelSignups,
         }
     }
 }

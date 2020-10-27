@@ -18,19 +18,73 @@ module.exports = {
             return 'Please supply a category name.'
         }
 
-        let if_exist = argv[2]
-        if (if_exist === undefined) if_exist = 'error'
-        if (!['error', 'delete', 'archive'].includes(if_exist)) {
-            return '"' + if_exist + '" is not a valid argument.'
+        // Start category creation
+        let pCategory = guild.channels.create(category_name, { 
+            type: 'category', 
+        })
+
+        // Generate possible error messages
+        const permissionErr
+            = "I don't have channel creation permissions."
+        const otherErr
+            = "Something went wrong creating the category."
+        pCategory.catch(err => {
+            console.error(err)
+            if (err instanceof Error && err.message === 'Missing Permissions') {
+                return permissionErr
+            }
+            return otherErr
+        })
+
+        // Wait for the category to be created or for it to fail
+        let category = await pCategory
+        
+        // Now actually check if the error actually happened
+        // String means it's an error (I hope)
+        if (typeof category === 'string') {
+            return 'Season start failed: ' + category
         }
 
-        // Generate a new map.
-        data().map = map.generateMap(30, 30)
+        // At this point, category is all good
+        // Now the role
+        // Start role creation
+        let pRole = guild.roles.create({
+            data: {
+                name: 'Season ' + category_name
+            },
+            reason: 'Start of Season ' + category_name
+        })
 
-        // let category = await guild.channels.create('Game', { 
-        //     type: 'category', 
-        // })
+        // Generate possible error messages
+        pRole.catch(err => {
+            console.error(err)
+            if (err instanceof Error && err.message === 'Missing Permissions') {
+                return permissionErr
+            }
+            return otherErr
+        })
 
-        return 'All set! A new season has begun!'
+        // Wait for the role to be created or for it to fail
+        let role = await pRole
+        
+        // Now actually check if the error actually happened
+        // String means it's an error (I hope)
+        if (typeof role === 'string') {
+
+            // Delete the category; it's bad now
+            category.delete()
+
+            return 'Season start failed: ' + role
+        }
+
+        // Category and role were created! Swell! Let's save them.
+        data.get().playerRole = role.id
+        data.get().channels.parent = category.id
+
+        // Lastly, let's create the signups channel.
+        let signups = await guild.channels.create('signups')
+        signups.setParent(category).then(() => data.get().channels.signups = signups.id)
+
+        return `All set! Go sign up for the next season on <#${signups.id}>!`
     })
 }
