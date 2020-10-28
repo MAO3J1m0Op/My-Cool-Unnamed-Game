@@ -31,6 +31,24 @@ class SeasonData {
 
 const data = new SeasonData()
 
-module.exports.get = function() {
+/**
+ * Gets the data object. This function returns a promise in case data is
+ * asked for before the request can be properly managed.
+ * @returns {Promise<SeasonData>} a promise to the data.
+ */
+module.exports.get = async function() {
     return data
+}
+
+/**
+ * Sets the key of the data object to the current value. Synonymous to
+ * <pre><code>
+ * get().then(data => data[key] = value)
+ * </code></pre>
+ * @param {string} key 
+ * @param {*} value 
+ * @returns {Promise<void>}
+ */
+module.exports.set = function(key, value) {
+    return module.exports.get().then(data => data[key] = value)
 }

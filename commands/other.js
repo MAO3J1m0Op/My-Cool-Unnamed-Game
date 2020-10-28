@@ -26,10 +26,10 @@ module.exports = {
         if (x === NaN || y === NaN) return badSyntax
 
         // Linting is done. Now, check capital
-        if (map.assignCapital(data.get(), msg.author.id, x, y)) {
+        if (map.assignCapital(await data.get(), msg.author.id, x, y)) {
 
             // Add them to role
-            let role = await guild.roles.fetch(data.get().playerRole)
+            let role = await guild.roles.fetch((await data.get()).playerRole)
             await msg.member.roles.add(role)
             return "You're in!"
         } else {

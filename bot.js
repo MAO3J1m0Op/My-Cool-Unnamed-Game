@@ -39,9 +39,11 @@ bot.on('message', msg => {
     reply(checkRunCommand(msg, '/', commands.game))
 
     // Check if the message is on the signups channel
-    if (msg.channel.id === data.get().channels.signups) {
-        reply(passToCommand(msg, commands.other.signup))
-    }
+    data.get().then(dat => {
+        if (msg.channel.id === dat.channels.signups) {
+            reply(passToCommand(msg, commands.other.signup))
+        }
+    })
 })
 
 /**
