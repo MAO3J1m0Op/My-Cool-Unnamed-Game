@@ -28,8 +28,7 @@ bot.on('message', msg => {
     reply(checkRunCommand(msg, '!', commands.server_admin, async (sender, guild, channel) => {
 
         // The sender must be a server admin
-        let authorAsMember = await guild.members.fetch(sender.id)
-        if (authorAsMember === undefined) 
+        if (guild === null) 
             throw 'You must be in a guild to run this kind of command.'
         
         if (!authorAsMember.hasPermission('ADMINISTRATOR'))
