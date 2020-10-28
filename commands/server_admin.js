@@ -81,6 +81,22 @@ module.exports = {
         data.get().playerRole = role.id
         data.get().channels.parent = category.id
 
+        // Create the map's residence channel
+        let mapChannelP = guild.channels.create('map')
+            .then(mapChannel => mapChannel.setParent(category))
+
+        // Create the map
+        let mapGeneratorP = map.generateMap(50, 50)
+        mapGeneratorP.then(mp => data.get().map = mp)
+
+        // Wait for both the channel and the map to generate
+        // Then render the map on the map channel
+        Promise.all(mapChannelP, mapGeneratorP).then(promises => {
+            let channel = promises[0]
+            let mp = promises[1]
+            channel.send(map.render(mp))
+        })
+
         // Lastly, let's create the signups channel.
         let signups = await guild.channels.create('signups')
         signups.setParent(category).then(() => data.get().channels.signups = signups.id)
