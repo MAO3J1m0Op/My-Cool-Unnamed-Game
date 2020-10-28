@@ -95,6 +95,14 @@ module.exports = {
             let channel = promises[0]
             let mp = promises[1]
             channel.send(map.render(mp))
+                .catch(err => {
+                    console.error("Unable to send map.")
+                    console.error(err)
+                    channel.send('[ Error in sending map ]')
+
+                        // At this point...really? Come on!
+                        .catch(console.error)
+                })
         })
 
         // Lastly, let's create the signups channel.
