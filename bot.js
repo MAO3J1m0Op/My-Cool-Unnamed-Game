@@ -17,15 +17,15 @@ bot.on('message', msg => {
     if (msg.author.id === bot.user.id) return
 
     // sudo commands
-    checkRunCommand(msg, '##', commands.sudo, (sender, guild, channel) => {
+    reply(checkRunCommand(msg, '##', commands.sudo, (sender, guild, channel) => {
 
         // The sender must be the "super user".
         if (sender.id !== auth.super_user)
             throw ('You are not the super user!')
-    })
+    }))
 
     // server admin commands
-    checkRunCommand(msg, '!', commands.server_admin, async (sender, guild, channel) => {
+    reply(checkRunCommand(msg, '!', commands.server_admin, async (sender, guild, channel) => {
 
         // The sender must be a server admin
         let authorAsMember = await guild.members.fetch(sender.id)
@@ -34,14 +34,14 @@ bot.on('message', msg => {
         
         if (!authorAsMember.hasPermission('ADMINISTRATOR'))
             throw 'You must be a server administrator to run this command.'
-    })
+    }))
 
     // Game commands
-    checkRunCommand(msg, '/', commands.game)
+    reply(checkRunCommand(msg, '/', commands.game))
 
     // Check if the message is on the signups channel
     if (msg.channel.id === data.get().channels.signups) {
-        passToCommand(msg, commands.other.signup)
+        reply(passToCommand(msg, commands.other.signup))
     }
 })
 
@@ -61,6 +61,8 @@ bot.on('message', msg => {
  * successfully, then the command will be run. If the function throws an
  * error, the error will be printed and the command ignored. If the error 
  * message is "", nothing will be sent and the command will still be ignored.
+ * @returns {Promise<{ input: discord.Message, output: string }>} an object containing both the
+ * input message and the command output.
  */
 async function checkRunCommand(msg, denoter, command_obj, 
     verification = async () => {}) {
@@ -74,10 +76,10 @@ async function checkRunCommand(msg, denoter, command_obj,
         try {
             await verification(sender, guild, channel)
         } catch (fail) {
-            return fail
+            return { input: msg, output: fail }
         }
 
-        return passToCommand(msg, command_obj[argv[0]], argv)
+        return { input: msg, output: passToCommand(msg, command_obj[argv[0]], argv) }
     }
 }
 
@@ -87,7 +89,8 @@ async function checkRunCommand(msg, denoter, command_obj,
  * @param {commands.Command} command the command to pass the message to.
  * @param {string[] | undefined} argv the optional argv to use instead of the
  * message body. If undefined is passed, the message body will be used instead.
- * @returns {string} the command output.
+ * @returns {Promise<{ input: discord.Message, output: string }>} an object containing both the
+ * input message and the command output.
  */
 async function passToCommand(msg, command, argv) {
     
@@ -118,18 +121,29 @@ async function passToCommand(msg, command, argv) {
             output = "Something went wrong executing your command."
         }
     }
+    
+    return { input: msg, output: output }
+}
+
+/**
+ * Replies to a given message.
+ * @param {Promise<{ input: discord.Message, output: string }>} ioObj the message to reply to and
+ * the command output (or other string) to send to reply to the given message.
+ */
+async function reply(ioObj) {
+
+    // Wait for the command to finish executing
+    io = await ioObj
 
     // Checks if output is undefined, null, or anything else Discord doesn't like.
     // Just an indication that the command was done.
-    if (!output) output = 'Done!'
-    
-    msg.reply(output).catch(err => {
+    if (!io.output) return
+
+    io.input.reply(io.output).catch(err => {
         console.error(err)
-        msg.reply('The command was executed, '
+        io.input.reply('The command was executed, '
             + 'but there was an error sending the message.')
     })
-
-    return output
 }
 
 // Parses sudo commands entered through console
