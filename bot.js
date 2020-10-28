@@ -136,10 +136,11 @@ async function reply(ioObj) {
 
     // Checks if output is undefined, null, or anything else Discord doesn't like.
     // Just an indication that the command was done.
-    if (!io.output) return
+    if (!io || !io.output) return
 
     io.input.reply(io.output).catch(err => {
         console.error(err)
+        console.error('Offending message: "' + io.output + '"')
         io.input.reply('The command was executed, '
             + 'but there was an error sending the message.')
     })
