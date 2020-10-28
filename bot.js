@@ -28,7 +28,8 @@ bot.on('message', msg => {
 
         // The sender must be a server admin
         let authorAsMember = await guild.members.fetch(sender.id)
-        if (authorAsMember === undefined) throw '"guild" is undefined.'
+        if (authorAsMember === undefined) 
+            throw 'You must be in a guild to run this kind of command.'
         
         if (!authorAsMember.hasPermission('ADMINISTRATOR'))
             throw 'You must be a server administrator to run this command.'
