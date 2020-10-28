@@ -11,6 +11,10 @@ bot.on('ready', () => {
 })
 
 bot.on('message', msg => {
+
+    // Ignore any and all bot message
+    if (msg.author.id === bot.user.id) return
+
     // sudo commands
     checkRunCommand(msg, '##', commands.sudo, (sender, guild, channel) => {
 
@@ -96,6 +100,16 @@ async function checkRunCommand(msg, denoter, command_obj,
                 + 'but there was an error sending the message.')
         })
     }
+
+    // Checks if output is undefined, null, or anything else Discord doesn't like.
+    // Just an indication that the command was done.
+    if (!output) output = 'Done!'
+    
+    msg.reply(output).catch(err => {
+        console.error(err)
+        msg.reply('The command was executed, '
+            + 'but there was an error sending the message.')
+    })
 }
 
 // Parses sudo commands entered through console
