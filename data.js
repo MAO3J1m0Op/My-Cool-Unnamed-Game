@@ -7,9 +7,30 @@ const map = require('./map.js')
  * Writes an object as a JSON file, overwriting any existing contents.
  * @param {string} path the path to the file.
  * @param {*} obj the object to write.
+ * @returns {Promise<void>} a promise to be settled when the file operation
+ * is complete.
  */
 async function writeJSON(path, obj) {
-    fs.writeFile(path, JSON.stringify(obj, null, 4))
+    return new Promise((resolve, reject) => {
+        fs.writeFile(path, JSON.stringify(obj, null, 4), err => {
+            if (err) reject() 
+            else resolve()
+        })
+    })
+}
+
+/**
+ * Reads in a JSON file and parses its contents.
+ * @param {*} path the path to the file.
+ * @returns {Promise<*>} a promise to the data being read in.
+ */
+async function readJSON(path) {
+    return new Promise((resolve, reject) => {
+        fs.readFile(path, null, (err, data) => {
+            if (err) reject(err)
+            else resolve(JSON.parse(data.toString('utf8')))
+        })
+    })
 }
 
 class SeasonData {
