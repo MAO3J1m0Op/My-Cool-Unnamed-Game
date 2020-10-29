@@ -17,7 +17,12 @@ module.exports = {
         }
 
         if (request == 'map') {
-            return map.render((await data.get()).map)
+            try {
+                var dat = await data.get()
+            } catch (err) {
+                return 'Something went wrong fetching the game data.'
+            }
+            return map.render(dat.map)
         }
     })
 }

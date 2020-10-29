@@ -75,7 +75,8 @@ module.exports.reload = async function() {
         dummyData.map = await readJSON(mapPath).catch(err => reject(err))
         data = dummyData
         resolve()
-    }).catch(err => {
+    })
+    dataBlockingPromise.catch(err => {
         console.error('An error occured reloading data: ' + err)
         console.error('Restart the bot to try again.')
     })

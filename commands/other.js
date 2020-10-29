@@ -25,11 +25,17 @@ module.exports = {
         const y = parseInt(numbers[1])
         if (x === NaN || y === NaN) return badSyntax
 
+        try {
+            var dat = await data.get()
+        } catch (err) {
+            return 'Something went wrong getting the game data.'
+        }
+
         // Linting is done. Now, check capital
-        if (map.assignCapital(await data.get(), msg.author.id, x, y)) {
+        if (map.assignCapital(dat.map, msg.author.id, x, y)) {
 
             // Add them to role
-            let role = await guild.roles.fetch((await data.get()).playerRole)
+            let role = await guild.roles.fetch(dat.playerRole)
             await msg.member.roles.add(role)
             return "You're in!"
         } else {

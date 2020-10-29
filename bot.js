@@ -43,7 +43,7 @@ bot.on('message', msg => {
         if (msg.channel.id === dat.channels.signups) {
             reply(passToCommand(msg, commands.other.signup))
         }
-    })
+    }).catch(() => {})
 })
 
 /**

@@ -13,6 +13,13 @@ module.exports = {
      */
     setup: new Command(async function(argv, sender, guild, channel) {
 
+        // First, let's fetch the data.
+        try {
+            var dat = await data.get()
+        } catch (err) {
+            return 'Could not start season: unable to fetch player data.'
+        }
+
         let category_name = argv[1]
         if (category_name === undefined) {
             return 'Please supply a category name.'
@@ -78,8 +85,8 @@ module.exports = {
         }
 
         // Category and role were created! Swell! Let's save them.
-        data.set('playerRole', role.id)
-        data.get().then(dat => dat.channels.parent = category.id)
+        dat.playerRole = role.id
+        dat.channels.parent = category.id
 
         // Create the map's residence channel
         let mapChannelP = guild.channels.create('map')
@@ -87,7 +94,7 @@ module.exports = {
 
         // Create the map
         let mapGeneratorP = map.generateMap(50, 50)
-        mapGeneratorP.then(mp => data.set('map', mp))
+        mapGeneratorP.then(mp => dat.map = mp)
 
         // Wait for both the channel and the map to generate
         // Then render the map on the map channel
@@ -108,7 +115,7 @@ module.exports = {
         // Lastly, let's create the signups channel.
         let signups = await guild.channels.create('signups')
         signups.setParent(category)
-            .then(() => data.get().then(dat => dat.channels.signups = signups.id))
+            .then(() => dat => dat.channels.signups = signups.id)
 
         return `All set! Go sign up for the next season on <#${signups.id}>!`
     })
