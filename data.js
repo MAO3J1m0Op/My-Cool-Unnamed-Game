@@ -21,7 +21,7 @@ async function writeJSON(path, obj) {
 
 /**
  * Reads in a JSON file and parses its contents.
- * @param {*} path the path to the file.
+ * @param {string} path the path to the file.
  * @returns {Promise<*>} a promise to the data being read in.
  */
 async function readJSON(path) {
@@ -50,7 +50,41 @@ class SeasonData {
     }
 }
 
-const data = new SeasonData()
+var data = new SeasonData()
+/**
+ * This promise is waited on when any operation involving data is called.
+ * This is to ensure that data is not being given when there isn't anything
+ * to give.
+ * @type {Promise<void>}
+ */
+var dataBlockingPromise
+const pathRoot = './data/'
+const mapPath = pathRoot + 'map.json'
+const dataPath = pathRoot + 'data.json'
+
+/**
+ * Reloads the data from the file.
+ */
+module.exports.reload = async function() {
+
+    // We're loading in data! Set to dataBlockingPromise to ensure data isn't
+    // asked for while we're reloading.
+    dataBlockingPromise = new Promise((resolve, reject) => {
+        // Use a dummy variable so it can be discarded if a reload fails.
+        let dummyData = await readJSON(dataPath).catch(err => reject(err))
+        dummyData.map = await readJSON(mapPath).catch(err => reject(err))
+        data = dummyData
+        resolve()
+    })
+    dataBlockingPromise.catch(err => {
+        console.error('An error occured reloading data: ' + err)
+        console.error('Restart the bot to try again.')
+    })
+    return dataBlockingPromise
+}
+
+// Call on initialization
+reload()
 
 /**
  * Gets the data object. This function returns a promise in case data is
@@ -58,6 +92,7 @@ const data = new SeasonData()
  * @returns {Promise<SeasonData>} a promise to the data.
  */
 module.exports.get = async function() {
+    await dataBlockingPromise
     return data
 }
 
