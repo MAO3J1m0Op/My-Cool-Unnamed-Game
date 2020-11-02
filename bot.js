@@ -80,7 +80,7 @@ async function checkRunCommand(msg, denoter, command_obj,
             return { input: msg, output: fail }
         }
 
-        return { input: msg, output: passToCommand(msg, command_obj[argv[0]], argv) }
+        return passToCommand(msg, command_obj[argv[0]], argv)
     }
 }
 
@@ -175,5 +175,5 @@ process.on('SIGINT', () => { console.log("\nUse 'stop' to exit.") })
 process.on('SIGUSR1', onClose)
 process.on('SIGUSR2', onClose)
 process.on('unhandledRejection', (reason, promise) => {
-    console.log('Unhandled Promise Rejection in: Promise', promise + '\nreason:', reason.stack)
+    console.log('Unhandled Promise Rejection in: Promise', promise + '\nreason:', reason)
 })
