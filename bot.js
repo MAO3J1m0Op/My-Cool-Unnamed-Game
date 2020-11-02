@@ -31,7 +31,7 @@ bot.on('message', msg => {
         if (guild === null) 
             throw 'You must be in a guild to run this kind of command.'
         
-        if (!authorAsMember.hasPermission('ADMINISTRATOR'))
+        if (!(await guild.members.fetch(sender.id)).hasPermission('ADMINISTRATOR'))
             throw 'You must be a server administrator to run this command.'
     }))
 

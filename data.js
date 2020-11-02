@@ -63,28 +63,33 @@ const mapPath = pathRoot + 'map.json'
 const dataPath = pathRoot + 'data.json'
 
 /**
+ * Reloads the data.
+ * @returns a promise that is resolved when the data is reloaded and rejected
+ * if the data fails.
+ */
+async function reloadPrivate() {
+    // Use a dummy variable so it can be discarded if a reload fails.
+    let dummyData = await readJSON(dataPath)
+    dummyData.map = await readJSON(mapPath)
+    data = dummyData
+}
+
+/**
  * Reloads the data from the file.
  */
 module.exports.reload = async function() {
 
     // We're loading in data! Set to dataBlockingPromise to ensure data isn't
     // asked for while we're reloading.
-    dataBlockingPromise = new Promise((resolve, reject) => {
-        // Use a dummy variable so it can be discarded if a reload fails.
-        let dummyData = await readJSON(dataPath).catch(err => reject(err))
-        dummyData.map = await readJSON(mapPath).catch(err => reject(err))
-        data = dummyData
-        resolve()
-    })
-    dataBlockingPromise.catch(err => {
-        console.error('An error occured reloading data: ' + err)
+    dataBlockingPromise = reloadPrivate()
+    return dataBlockingPromise.catch(err => {
+        console.error('An error occurred reloading data: ' + err)
         console.error('Restart the bot to try again.')
     })
-    return dataBlockingPromise
 }
 
 // Call on initialization
-reload()
+module.exports.reload()
 
 /**
  * Gets the data object. This function returns a promise in case data is
