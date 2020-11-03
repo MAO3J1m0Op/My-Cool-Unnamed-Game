@@ -115,7 +115,7 @@ module.exports = {
         // Lastly, let's create the signups channel.
         let signups = await guild.channels.create('signups')
         signups.setParent(category)
-            .then(() => dat => dat.channels.signups = signups.id)
+            .then(() => dat.channels.signups = signups.id)
 
         return `All set! Go sign up for the next season on <#${signups.id}>!`
     })
