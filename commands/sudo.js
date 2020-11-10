@@ -5,10 +5,6 @@ const Command = require('./Command.js')
  * user or through the server console. Indicated with a ##.
  */
 module.exports = {
-    stop: new Command(function() {
-        process.exit(0)
-    }),
-
     // The testing function
     ping: new Command(async function() {
         return 'pong'

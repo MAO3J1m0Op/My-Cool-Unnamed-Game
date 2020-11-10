@@ -149,8 +149,8 @@ async function reply(ioObj) {
 }
 
 // Parses sudo commands entered through console
-var stdin = process.openStdin()
-stdin.addListener('data', async function(command) {
+process.stdin.resume()
+process.stdin.addListener('data', async function(command) {
     let argv = command.toString().trim().split(' ')
     let output
     try {
@@ -162,18 +162,29 @@ stdin.addListener('data', async function(command) {
 })
 
 /**
- * Releases all of the bot's assets.
+ * Calls close()
  */
-function onClose() {
+commands.sudo.stop = new commands.Command(async function() {
+    // Calls onClose function after 5 seconds.
+    const DELAY_STOP_TIME = 3
+    console.log(`Bot closing in ${DELAY_STOP_TIME} seconds.`)
+    setTimeout(close, DELAY_STOP_TIME * 1000);
+    return 'Goodbye!'
+})
+
+/**
+ * Closes everything. After this function is called and resolves, everything
+ * should exit gracefully.
+ */
+async function close() {
     console.log('Releasing assets.')
+    bot.destroy()
+    process.stdin.destroy()
     console.log('All assets released.')
 }
 
 // Exit protection
-process.on('exit', onClose)
 process.on('SIGINT', () => { console.log("\nUse 'stop' to exit.") })
-process.on('SIGUSR1', onClose)
-process.on('SIGUSR2', onClose)
 process.on('unhandledRejection', (reason, promise) => {
     console.log('Unhandled Promise Rejection in: Promise', promise + '\nreason:', reason)
 })
