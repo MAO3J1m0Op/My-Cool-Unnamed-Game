@@ -1,4 +1,4 @@
-const fs = require('fs')
+const fs = require('fs').promises
 const discord = require('discord.js')
 
 const map = require('./map.js')
@@ -11,12 +11,7 @@ const map = require('./map.js')
  * is complete.
  */
 async function writeJSON(path, obj) {
-    return new Promise((resolve, reject) => {
-        fs.writeFile(path, JSON.stringify(obj, null, 4), err => {
-            if (err) reject() 
-            else resolve()
-        })
-    })
+    return fs.writeFile(path, JSON.stringify(obj, null, 4))
 }
 
 /**
@@ -25,19 +20,20 @@ async function writeJSON(path, obj) {
  * @returns {Promise<*>} a promise to the data being read in.
  */
 async function readJSON(path) {
-    return new Promise((resolve, reject) => {
-        fs.readFile(path, null, (err, data) => {
-            if (err) reject(err)
-            else resolve(JSON.parse(data.toString('utf8')))
-        })
-    })
+    try {
+        await fs.access(path)
+    } catch (err) {
+        console.log(`Could not find file ${path}. Continuing as if file reads "{}".`)
+        return {} // An empty JSON object
+    }
+    return JSON.parse(await fs.readFile(path, { encoding: 'utf8', flag: '' }))
 }
 
 class SeasonData {
     /**
      * @param {map.GridSquare[][]} map 
      * @param {string} parentCategory 
-     * @param {string} channelSignin 
+     * @param {string} channelSignups
      * @param {string} playerRole
      */
     constructor(map, parentCategory, channelSignups, playerRole) {
@@ -70,6 +66,7 @@ const dataPath = pathRoot + 'data.json'
 async function reloadPrivate() {
     // Use a dummy variable so it can be discarded if a reload fails.
     let dummyData = await readJSON(dataPath)
+    if (Object.keys(dummyData).length === 0) dummyData = new SeasonData()
     dummyData.map = await readJSON(mapPath)
     data = dummyData
 }
