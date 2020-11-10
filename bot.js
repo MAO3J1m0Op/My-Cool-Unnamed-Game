@@ -134,7 +134,7 @@ async function passToCommand(msg, command, argv) {
 async function reply(ioObj) {
 
     // Wait for the command to finish executing
-    io = await ioObj
+    let io = await ioObj
 
     // Checks if output is undefined, null, or anything else Discord doesn't like.
     // Just an indication that the command was done.
