@@ -32,11 +32,11 @@ module.exports = {
         }
 
         // Linting is done. Now, check capital
-        if (map.assignCapital(dat.map, msg.author.id, x, y)) {
+        if (map.assignCapital(dat.map, sender.id, x, y)) {
 
             // Add them to role
             let role = await guild.roles.fetch(dat.playerRole)
-            await msg.member.roles.add(role)
+            (await guild.members.fetch(sender.id)).roles.add(role)
             return "You're in!"
         } else {
             return 'Your capital is in an invalid spot. Try a different spot.'
