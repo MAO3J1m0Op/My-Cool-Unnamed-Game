@@ -97,6 +97,8 @@ function saveAll() {
     return Promise.all([dat, mp])
 }
 
+module.exports.save = async () => { await saveAll() }
+
 // Starts saveAll on an interval
 const SAVE_INTERVAL_MINS = 3
 const SAVE_INTERVAL_MS = SAVE_INTERVAL_MINS * 60 * 1000
