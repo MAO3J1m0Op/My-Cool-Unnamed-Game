@@ -1,37 +1,5 @@
 const random = require('./random')
 
-/**
- * Represents a map and contains some helper functions.
- * @param {GridSquare[][]} arr the array containing the map's data
- */
-class GameMap {
-    constructor(arr) {
-        this.arr = arr
-    }
-}
-
-module.exports = GameMap
-
-class Biome {
-    /**
-     * @param {string} name the name of the biome.
-     * @param {string} emoji the emoji that represents a tile of this biome.
-     */
-    constructor(name, emoji) {
-        this.name = name
-        this.emoji = emoji
-    }
-    toString() {
-        return this.name
-    }
-}
-module.exports.Biome = Biome
-
-module.exports.biomes = {
-    forest: new Biome('forest', ':green_square:'),
-    desert: new Biome('desert', ':yellow_square:')
-}
-
 class GridSquare {
     /**
      * @param {Biome} biome the biome of this square.
@@ -43,32 +11,22 @@ class GridSquare {
         this.capital = capital
     }
 }
-module.exports.GridSquare = GridSquare
 
 /**
- * Generates a new biome map and returns it.
- * @param {number} sizeX 
- * @param {number} sizeY
- * @returns {Promise<GameMap>} a promise to the completed biome map.
+ * Represents a map and contains some helper functions.
  */
-module.exports.generateMap = async function(sizeX, sizeY) {
-    let val = []
-    for (let x = 0; x < Math.floor(sizeX); ++x) {
-        let row = []
-        for (let y = 0; y < Math.floor(sizeY); ++y) {
-            row.push(new GridSquare(
-                module.exports.biomes[random.attribute(module.exports.biomes)]
-            ))
-        }
-        val.push(row)
+class GameMap {
+    /**
+     * @param {GridSquare[][]} arr the array containing the map's data
+     */
+    constructor(arr) {
+        this.arr = arr
     }
-    return new GameMap(val)
-}
 
 /**
  * Converts a map into a string of emojis to render the map for Discord.
  */
-module.exports.prototype.render = function() {
+render() {
     this.arr.reduce((x0, x) => {
         return x0 + x.reduce((y0, y) => {
             return y0 + '\\' + y.biome.emoji
@@ -84,7 +42,7 @@ module.exports.prototype.render = function() {
  * @returns {boolean} true if the capital is in a valid position and was
  * placed, false if the capital's position is invalid.
  */
-module.exports.prototype.assignCapital = function(player, x, y) {
+assignCapital(player, x, y) {
     
     const distance = 2 // King move limit for capitals
 
@@ -106,4 +64,48 @@ module.exports.prototype.assignCapital = function(player, x, y) {
         this.arr[x][y].capital = player
         return true
     } else return false
+}
+}
+
+class Biome {
+    /**
+     * @param {string} name the name of the biome.
+     * @param {string} emoji the emoji that represents a tile of this biome.
+     */
+    constructor(name, emoji) {
+        this.name = name
+        this.emoji = emoji
+    }
+    toString() {
+        return this.name
+    }
+}
+
+module.exports = GameMap
+module.exports.GridSquare = GridSquare
+module.exports.Biome = Biome
+
+module.exports.biomes = {
+    forest: new Biome('forest', ':green_square:'),
+    desert: new Biome('desert', ':yellow_square:')
+}
+
+/**
+ * Generates a new biome map and returns it.
+ * @param {number} sizeX 
+ * @param {number} sizeY
+ * @returns {Promise<GameMap>} a promise to the completed biome map.
+ */
+module.exports.generateMap = async function(sizeX, sizeY) {
+    let val = []
+    for (let x = 0; x < Math.floor(sizeX); ++x) {
+        let row = []
+        for (let y = 0; y < Math.floor(sizeY); ++y) {
+            row.push(new GridSquare(
+                module.exports.biomes[random.attribute(module.exports.biomes)]
+            ))
+        }
+        val.push(row)
+    }
+    return new GameMap(val)
 }
