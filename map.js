@@ -23,48 +23,48 @@ class GameMap {
         this.arr = arr
     }
 
-/**
- * Converts a map into a string of emojis to render the map for Discord.
- */
-render() {
-    this.arr.reduce((x0, x) => {
-        return x0 + x.reduce((y0, y) => {
-            return y0 + '\\' + y.biome.emoji
-        }, '') + '\n'
-    }, '')
-}
+    /**
+     * Converts a map into a string of emojis to render the map for Discord.
+     */
+    render() {
+        this.arr.reduce((x0, x) => {
+            return x0 + x.reduce((y0, y) => {
+                return y0 + '\\' + y.biome.emoji
+            }, '') + '\n'
+        }, '')
+    }
 
-/**
- * Sets a position on a map as a player's capital if the position is valid.
- * @param {string} player the players to assign a capital for.
- * @param {number} x the x position of the new capital.
- * @param {number} y the y position of the new capital.
- * @returns {boolean} true if the capital is in a valid position and was
- * placed, false if the capital's position is invalid.
- */
-assignCapital(player, x, y) {
-    
-    const distance = 2 // King move limit for capitals
+    /**
+     * Sets a position on a map as a player's capital if the position is valid.
+     * @param {string} player the players to assign a capital for.
+     * @param {number} x the x position of the new capital.
+     * @param {number} y the y position of the new capital.
+     * @returns {boolean} true if the capital is in a valid position and was
+     * placed, false if the capital's position is invalid.
+     */
+    assignCapital(player, x, y) {
+        
+        const distance = 2 // King move limit for capitals
 
-    // Gets the length of the y
-    const lenY = this.arr.map(arr => arr.length).reduce((a, b) => Math.min(a, b))
-    
-    // Bounds checks
-    const lowX = Math.max(x - distance, 0)
-    const hiX = Math.min(x + distance + 1, this.arr.length)
-    const lowY = Math.max(y - distance, 0)
-    const hiY = Math.min(y + distance + 1, lenY)
+        // Gets the length of the y
+        const lenY = this.arr.map(arr => arr.length).reduce((a, b) => Math.min(a, b))
+        
+        // Bounds checks
+        const lowX = Math.max(x - distance, 0)
+        const hiX = Math.min(x + distance + 1, this.arr.length)
+        const lowY = Math.max(y - distance, 0)
+        const hiY = Math.min(y + distance + 1, lenY)
 
-    // Checks the squares at and surrounding the potential capital
-    if (this.arr.slice(lowX, hiX).every(arr => {
-        return arr.slice(lowY, hiY).every(sq => {
-            return sq.capital === null
-        })
-    })) {
-        this.arr[x][y].capital = player
-        return true
-    } else return false
-}
+        // Checks the squares at and surrounding the potential capital
+        if (this.arr.slice(lowX, hiX).every(arr => {
+            return arr.slice(lowY, hiY).every(sq => {
+                return sq.capital === null
+            })
+        })) {
+            this.arr[x][y].capital = player
+            return true
+        } else return false
+    }
 }
 
 class Biome {
