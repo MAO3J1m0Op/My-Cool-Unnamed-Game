@@ -25,9 +25,10 @@ class GameMap {
 
     /**
      * Converts a map into a string of emojis to render the map for Discord.
+     * @returns {string}
      */
     render() {
-        this.arr.reduce((x0, x) => {
+        return this.arr.reduce((x0, x) => {
             return x0 + x.reduce((y0, y) => {
                 return y0 + '\\' + y.biome.emoji
             }, '') + '\n'
