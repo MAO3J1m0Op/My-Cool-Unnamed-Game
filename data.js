@@ -59,6 +59,45 @@ const mapPath = pathRoot + 'map.json'
 const dataPath = pathRoot + 'data.json'
 
 /**
+ * Writes data.map to file.
+ */
+async function saveMap() {
+    let dat
+    try {
+        dat = (await module.exports.get()).map
+    } catch (err) { return } // Do nothing if the data is broken
+    return writeJSON(mapPath, dat)
+}
+
+/**
+ * Writes all data (excluding the map) to file.
+ */
+async function saveData() {
+    let datCopy = {}
+    let dat
+    try {
+        dat = await module.exports.get()
+    } catch (err) { return } // Do nothing if the data is broken
+
+    // Make a shallow copy
+    for (const key in dat) {
+        if (key === 'map') continue // Skip the map object
+        datCopy[key] = dat[key]
+    }
+
+    return writeJSON(dataPath, datCopy)
+}
+
+/**
+ * Saves both data and map.
+ */
+function saveAll() {
+    let dat = saveData().then(() => console.log('Data written to file ' + dataPath))
+    let mp = saveMap().then(() => console.log('Map written to file ' + mapPath))
+    return Promise.all([dat, mp])
+}
+
+/**
  * Reloads the data.
  * @returns a promise that is resolved when the data is reloaded and rejected
  * if the data fails.
