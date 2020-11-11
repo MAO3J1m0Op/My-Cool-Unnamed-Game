@@ -1,6 +1,5 @@
 const Command = require('./Command.js')
 const data = require('../data.js')
-const map = require('../map.js')
 
 /**
  * Commands that don't belong to a command object.
@@ -32,7 +31,7 @@ module.exports = {
         }
 
         // Linting is done. Now, check capital
-        if (map.assignCapital(dat.map, sender.id, x, y)) {
+        if (dat.map.assignCapital(sender.id, x, y)) {
 
             // Add them to role
             let role = await guild.roles.fetch(dat.playerRole)

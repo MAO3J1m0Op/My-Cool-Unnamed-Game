@@ -1,6 +1,6 @@
 const Command = require('./Command.js')
 const data = require('../data.js')
-const map = require('../map.js')
+const GameMap = require('../map.js')
 
 /**
  * The commands that only an administrator of a Discord server can execute.
@@ -93,7 +93,7 @@ module.exports = {
             .then(mapChannel => mapChannel.setParent(category))
 
         // Create the map
-        let mapGeneratorP = map.generateMap(50, 50)
+        let mapGeneratorP = GameMap.generateMap(50, 50)
         mapGeneratorP.then(mp => dat.map = mp)
 
         // Wait for both the channel and the map to generate
@@ -101,7 +101,7 @@ module.exports = {
         Promise.all(mapChannelP, mapGeneratorP).then(promises => {
             let channel = promises[0]
             let mp = promises[1]
-            channel.send(map.render(mp))
+            channel.send(mp.render())
                 .catch(err => {
                     console.error("Unable to send map.")
                     console.error(err)

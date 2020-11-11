@@ -1,7 +1,7 @@
 const fs = require('fs').promises
 const discord = require('discord.js')
 
-const map = require('./map.js')
+const GameMap = require('./map.js')
 
 /**
  * Creates a folder, or does nothing if the folder already exists.
@@ -42,12 +42,12 @@ async function readJSON(path) {
 
 class SeasonData {
     /**
-     * @param {map.GridSquare[][]} map 
+     * @param {GameMap} map 
      * @param {string} parentCategory 
      * @param {string} channelSignups
      * @param {string} playerRole
      */
-    constructor(map, parentCategory, channelSignups, playerRole) {
+    constructor(map = new GameMap(), parentCategory, channelSignups, playerRole) {
         this.map = map
         this.playerRole = playerRole
         this.channels = {

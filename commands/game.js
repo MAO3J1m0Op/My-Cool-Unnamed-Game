@@ -1,4 +1,3 @@
-const map = require('../map.js')
 const data = require('../data.js')
 
 const Command = require('./Command.js')
@@ -22,7 +21,7 @@ module.exports = {
             } catch (err) {
                 return 'Something went wrong fetching the game data.'
             }
-            return map.render(dat.map)
+            return dat.map.render()
         }
     })
 }
