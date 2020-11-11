@@ -97,6 +97,17 @@ function saveAll() {
     return Promise.all([dat, mp])
 }
 
+// Starts saveAll on an interval
+const SAVE_INTERVAL_MINS = 3
+const SAVE_INTERVAL_MS = SAVE_INTERVAL_MINS * 60 * 1000
+const saveInterval = setInterval(saveAll, SAVE_INTERVAL_MS)
+
+module.exports.close = async function() {
+    console.log('Releasing assets of data.js')
+    clearInterval(saveInterval); console.log('Saving interval stopped.')
+    saveAll().then(() => console.log('data.js has been closed.'))
+}
+
 /**
  * Reloads the data.
  * @returns a promise that is resolved when the data is reloaded and rejected

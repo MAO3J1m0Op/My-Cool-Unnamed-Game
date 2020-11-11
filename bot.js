@@ -180,6 +180,7 @@ async function close() {
     console.log('Releasing assets.')
     bot.destroy()
     process.stdin.destroy()
+    data.close()
     console.log('All assets released.')
 }
 
