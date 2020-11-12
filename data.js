@@ -4,6 +4,17 @@ const discord = require('discord.js')
 const map = require('./map.js')
 
 /**
+ * Creates a folder, or does nothing if the folder already exists.
+ * @param {string} path the path to the folder to create.
+ */
+function makeFolder(path) {
+    return fs.mkdir(path).catch(err => {
+        if (err.code == 'EEXIST') { return }
+        else throw err
+    })
+}
+
+/**
  * Writes an object as a JSON file, overwriting any existing contents.
  * @param {string} path the path to the file.
  * @param {*} obj the object to write.
@@ -116,6 +127,10 @@ module.exports.close = async function() {
  * if the data fails.
  */
 async function reloadPrivate() {
+
+    // Ensures the enclosing folder exists.
+    makeFolder(pathRoot)
+
     // Use a dummy variable so it can be discarded if a reload fails.
     let dummyData = await readJSON(dataPath)
     if (Object.keys(dummyData).length === 0) dummyData = new SeasonData()
