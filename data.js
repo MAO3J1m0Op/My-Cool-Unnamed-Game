@@ -102,23 +102,22 @@ async function saveData() {
 /**
  * Saves both data and map.
  */
-function saveAll() {
+module.exports.save = async function() {
     let dat = saveData().then(() => console.log('Data written to file ' + dataPath))
     let mp = saveMap().then(() => console.log('Map written to file ' + mapPath))
-    return Promise.all([dat, mp])
+    await Promise.all([dat, mp])
+    return
 }
 
-module.exports.save = async () => { await saveAll() }
-
-// Starts saveAll on an interval
+// Starts save on an interval
 const SAVE_INTERVAL_MINS = 3
 const SAVE_INTERVAL_MS = SAVE_INTERVAL_MINS * 60 * 1000
-const saveInterval = setInterval(saveAll, SAVE_INTERVAL_MS)
+const saveInterval = setInterval(module.exports.save, SAVE_INTERVAL_MS)
 
 module.exports.close = async function() {
     console.log('Releasing assets of data.js')
     clearInterval(saveInterval); console.log('Saving interval stopped.')
-    saveAll().then(() => console.log('data.js has been closed.'))
+    module.exports.save().then(() => console.log('data.js has been closed.'))
 }
 
 /**
