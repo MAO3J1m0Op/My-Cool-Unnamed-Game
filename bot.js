@@ -180,7 +180,10 @@ async function close() {
     console.log('Releasing assets.')
     bot.destroy()
     process.stdin.destroy()
-    data.close()
+    let dat = data.close()
+
+    // Place any additional promises in this await statement
+    await Promise.all([dat])
     console.log('All assets released.')
 }
 

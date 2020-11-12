@@ -117,7 +117,7 @@ const saveInterval = setInterval(module.exports.save, SAVE_INTERVAL_MS)
 module.exports.close = async function() {
     console.log('Releasing assets of data.js')
     clearInterval(saveInterval); console.log('Saving interval stopped.')
-    module.exports.save().then(() => console.log('data.js has been closed.'))
+    return module.exports.save().then(() => console.log('data.js has been closed.'))
 }
 
 /**
