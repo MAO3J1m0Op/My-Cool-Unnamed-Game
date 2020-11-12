@@ -125,8 +125,16 @@ module.exports.close = async function() {
  * Reloads the data.
  * @returns a promise that is resolved when the data is reloaded and rejected
  * if the data fails.
+ * @param {boolean} noFiles if true, the data files will be ignored and the default
+ * values loaded in.
  */
-async function reloadPrivate() {
+async function reloadPrivate(noFiles = false) {
+
+    if (noFiles) {
+        data = new SeasonData()
+        console.log('Data files have been ignored. Using default values.')
+        return
+    }
 
     // Ensures the enclosing folder exists.
     makeFolder(pathRoot)
@@ -140,12 +148,14 @@ async function reloadPrivate() {
 
 /**
  * Reloads the data from the file.
+ * @param {boolean} noFiles if true, the data files will be ignored and the default
+ * values loaded in.
  */
-module.exports.reload = async function() {
+module.exports.reload = async function(noFiles = false) {
 
     // We're loading in data! Set to dataBlockingPromise to ensure data isn't
     // asked for while we're reloading.
-    dataBlockingPromise = reloadPrivate()
+    dataBlockingPromise = reloadPrivate(noFiles)
     return dataBlockingPromise.catch(err => {
         console.error('An error occurred reloading data: ' + err)
         console.error('Restart the bot to try again.')

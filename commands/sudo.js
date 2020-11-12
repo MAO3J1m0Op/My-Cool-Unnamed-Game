@@ -14,8 +14,9 @@ module.exports = {
     /**
      * Calls reload in data.js.
      */
-    reload: new Command(async function() {
-        await data.reload()
+    reload: new Command(async function(argv) {
+        let noFiles = argv[1] === 'noFiles'
+        await data.reload(noFiles)
         return 'Reload complete.'
     }),
 
