@@ -24,6 +24,20 @@ class GameMap {
     }
 
     /**
+     * Returns the length of the map on the X axis.
+     */
+    lengthX() {
+        return this.arr.length
+    }
+    
+    /**
+     * Returns the length of the map on the Y axis.
+     */
+    lengthY() {
+        return this.arr.map(arr => arr.length).reduce((a, b) => Math.min(a, b))
+    }
+
+    /**
      * Converts a map into a string of emojis to render the map for Discord.
      * @returns {string}
      */
@@ -48,13 +62,12 @@ class GameMap {
         const distance = 2 // King move limit for capitals
 
         // Gets the length of the y
-        const lenY = this.arr.map(arr => arr.length).reduce((a, b) => Math.min(a, b))
         
         // Bounds checks
         const lowX = Math.max(x - distance, 0)
-        const hiX = Math.min(x + distance + 1, this.arr.length)
+        const hiX = Math.min(x + distance + 1, this.lengthX())
         const lowY = Math.max(y - distance, 0)
-        const hiY = Math.min(y + distance + 1, lenY)
+        const hiY = Math.min(y + distance + 1, this.lengthY())
 
         // Checks the squares at and surrounding the potential capital
         if (this.arr.slice(lowX, hiX).every(arr => {
