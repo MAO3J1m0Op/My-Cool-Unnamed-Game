@@ -166,7 +166,7 @@ process.stdin.addListener('data', async function(command) {
  */
 commands.sudo.stop = new commands.Command(async function() {
     // Calls onClose function after 5 seconds.
-    const DELAY_STOP_TIME = 3
+    const DELAY_STOP_TIME = data.settings.botCloseDelaySeconds
     console.log(`Bot closing in ${DELAY_STOP_TIME} seconds.`)
     setTimeout(close, DELAY_STOP_TIME * 1000);
     return 'Goodbye!'

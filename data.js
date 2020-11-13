@@ -44,7 +44,16 @@ async function readJSON(path) {
  * The default contents of the settings file.
  */
 const DEFAULT_SETTINGS = {
-    
+    // The number of seconds before the bot closes.
+    botCloseDelaySeconds: 3,
+    // The number of minutes between each save refresh.
+    dataSaveIntervalMins: 3,
+    // The path to the data folder (with trailing slash)
+    dataPathRoot: './data/',
+    // The name of the map file name
+    dataMapFileName: 'map.json',
+    // The name of the data file name
+    dataFileName: 'data.json'
 }
 const SETTINGS_PATH = './settings.json'
 
@@ -97,9 +106,10 @@ var data = new SeasonData()
  * @type {Promise<void>}
  */
 var dataBlockingPromise
-const pathRoot = './data/'
-const mapPath = pathRoot + 'map.json'
-const dataPath = pathRoot + 'data.json'
+const mapPath = module.exports.settings.dataPathRoot 
+    + module.exports.settings.dataMapFileName
+const dataPath = module.exports.settings.dataPathRoot 
+    + module.exports.settings.dataFileName
 
 /**
  * Writes data.map to file.
@@ -168,7 +178,7 @@ async function reloadPrivate(noFiles = false) {
     }
 
     // Ensures the enclosing folder exists.
-    makeFolder(pathRoot)
+    makeFolder(module.exports.settings.dataPathRoot)
 
     // Use a dummy variable so it can be discarded if a reload fails.
     let dummyData = await readJSON(dataPath)
