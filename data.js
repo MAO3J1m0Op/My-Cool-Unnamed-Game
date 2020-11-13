@@ -62,9 +62,10 @@ const SETTINGS_PATH = './settings.json'
  * @return {typeof DEFAULT_SETTINGS} 
  */
 function readSettings() {
+    let val
     try {
         console.log('Reading in settings.')
-        return require(SETTINGS_PATH)
+        val = require(SETTINGS_PATH)
     } catch (err) {
         // No settings.json file exists
         if (err.code = 'MODULE_NOT_FOUND') {
@@ -77,6 +78,19 @@ function readSettings() {
         }
         else throw err
     }
+
+    // Ensure the read-in file has all of the settings
+    for (const setting in DEFAULT_SETTINGS) {
+
+        // Runs if the values are not the same type
+        if (!(typeof val[setting] === typeof DEFAULT_SETTINGS[setting])) {
+            console.log(`${setting} value "${val[setting]}" is invalid. ` +
+            `Applying default value: ${DEFAULT_SETTINGS[setting]}.`)
+            val[setting] = DEFAULT_SETTINGS[setting]
+        }
+    }
+
+    return val
 }
 
 module.exports.settings = readSettings()
