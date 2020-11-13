@@ -93,7 +93,19 @@ function readSettings() {
     return val
 }
 
+/**
+ * @type {(typeof DEFAULT_SETTINGS) & { write: () => Promise<void>}}
+ */
 module.exports.settings = readSettings()
+/**
+ * Writes the current settings to file. Useful for overwriting invalid 
+ * settings.
+ */
+module.exports.settings.write = function() {
+    return writeJSON(SETTINGS_PATH, module.exports.settings)
+}
+
+module.exports.settings.write()
 
 class SeasonData {
     /**

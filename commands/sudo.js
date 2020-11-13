@@ -23,5 +23,10 @@ module.exports = {
     savenow: new Command(async function() {
         await data.save()
         return 'Saved data.'
+    }),
+
+    writesettings: new Command(async function() {
+        await data.settings.write()
+        return 'Settings file updated.'
     })
 }
