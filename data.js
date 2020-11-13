@@ -40,6 +40,38 @@ async function readJSON(path) {
     return JSON.parse(await fs.readFile(path, { encoding: 'utf8', flag: '' }))
 }
 
+/**
+ * The default contents of the settings file.
+ */
+const DEFAULT_SETTINGS = {
+    
+}
+const SETTINGS_PATH = './settings.json'
+
+/**
+ * Reads in settings.json and returns its value.
+ * @return {typeof DEFAULT_SETTINGS} 
+ */
+function readSettings() {
+    try {
+        console.log('Reading in settings.')
+        return require(SETTINGS_PATH)
+    } catch (err) {
+        // No settings.json file exists
+        if (err.code = 'MODULE_NOT_FOUND') {
+            console.log('No settings file found. Assuming default settings.')
+            writeJSON(SETTINGS_PATH, DEFAULT_SETTINGS).then(() => {
+                console.log('A new settings file has been created at ' 
+                    + SETTINGS_PATH)
+            })
+            return DEFAULT_SETTINGS
+        }
+        else throw err
+    }
+}
+
+module.exports.settings = readSettings()
+
 class SeasonData {
     /**
      * @param {GameMap} map 
