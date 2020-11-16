@@ -53,7 +53,11 @@ const DEFAULT_SETTINGS = {
     // The name of the map file name
     dataMapFileName: 'map.json',
     // The name of the data file name
-    dataFileName: 'data.json'
+    dataFileName: 'data.json',
+    // Bot authtoken
+    authToken: "[ bot's auth token goes here ]",
+    // Discord User ID for the user that can run sudo commands.
+    superUser: '[ super user ID goes here ]',
 }
 const SETTINGS_PATH = './settings.json'
 
