@@ -1,11 +1,10 @@
 const discord = require('discord.js')
 
 const commands = require('./commands.js')
-const auth = require('./auth.json')
 const data = require('./data.js')
 
 const bot = new discord.Client();
-bot.login(auth.token)
+bot.login(data.settings.authToken)
 
 bot.on('ready', () => {
     console.log("The bot is now active.")
@@ -20,7 +19,7 @@ bot.on('message', msg => {
     reply(checkRunCommand(msg, '##', commands.sudo, (sender, guild, channel) => {
 
         // The sender must be the "super user".
-        if (sender.id !== auth.super_user)
+        if (sender.id !== data.settings.superUser)
             throw ('You are not the super user!')
     }))
 
