@@ -4,7 +4,11 @@ const commands = require('./commands.js')
 const data = require('./data.js')
 
 const bot = new discord.Client();
-bot.login(data.settings.authToken)
+bot.login(data.settings.authToken).catch(err => {
+    console.error('FATAL: client could not login.')
+    console.error('Reason: ' + err)
+    close()
+})
 
 bot.on('ready', () => {
     console.log("The bot is now active.")
