@@ -99,7 +99,7 @@ module.exports = {
 
         // Wait for both the channel and the map to generate
         // Then render the map on the map channel
-        Promise.all(mapChannelP, mapGeneratorP).then(promises => {
+        Promise.all([mapChannelP, mapGeneratorP]).then(promises => {
             let channel = promises[0]
             let mp = promises[1]
             channel.send(mp.render())
