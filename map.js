@@ -2,14 +2,28 @@ const random = require('./random')
 
 class GridSquare {
     /**
-     * @param {Biome} biome the biome of this square.
+     * @param {string} biome the name of the biome of this square.
      * @param {string | null} capital the player whose capital is this square
      * (or null if there is no capital).
      */
     constructor(biome, capital = null) {
-        this.biome = biome
+        this._biome = biome
         this.capital = capital
     }
+
+    /**
+     * @returns {Biome} the biome of this square.
+     */
+    get biome() {
+        return module.exports.biomes[this._biome]
+    }
+}
+
+/**
+ * Converts an object with GridSquare-like data into a GridSquare.
+ */
+GridSquare.fromObj = function(obj) {
+    return new GridSquare(obj._biome, obj.capital)
 }
 
 /**
@@ -116,7 +130,7 @@ module.exports.generateMap = async function(sizeX, sizeY) {
         let row = []
         for (let y = 0; y < Math.floor(sizeY); ++y) {
             row.push(new GridSquare(
-                module.exports.biomes[random.attribute(module.exports.biomes)]
+                random.attribute(module.exports.biomes)
             ))
         }
         val.push(row)

@@ -150,7 +150,7 @@ const dataPath = module.exports.settings.dataPathRoot
 async function saveMap() {
     let dat
     try {
-        dat = (await module.exports.get()).map
+        dat = (await module.exports.get()).map.arr
     } catch (err) { return } // Do nothing if the data is broken
     return writeJSON(mapPath, dat)
 }
@@ -215,7 +215,9 @@ async function reloadPrivate(noFiles = false) {
     // Use a dummy variable so it can be discarded if a reload fails.
     let dummyData = await readJSON(dataPath)
     if (Object.keys(dummyData).length === 0) dummyData = new SeasonData()
-    dummyData.map = await readJSON(mapPath)
+    let mapArr = (await readJSON(mapPath))
+        .map(subArr => subArr.map(entry => GameMap.GridSquare.fromObj(entry)))
+    dummyData.map = new GameMap(mapArr)
     data = dummyData
 }
 
