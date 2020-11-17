@@ -178,7 +178,6 @@ module.exports.save = async function() {
     let dat = saveData().then(() => console.log('Data written to file ' + dataPath))
     let mp = saveMap().then(() => console.log('Map written to file ' + mapPath))
     await Promise.all([dat, mp])
-    return
 }
 
 // Starts save on an interval
