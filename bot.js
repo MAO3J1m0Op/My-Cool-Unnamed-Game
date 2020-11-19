@@ -155,13 +155,11 @@ async function reply(ioObj) {
 process.stdin.resume()
 process.stdin.addListener('data', async function(command) {
     let argv = command.toString().trim().split(' ')
-    let output
-    try {
-        output = await commands.sudo[argv[0]].execute(argv, '[console]', null, null)
-    } catch (err) {
-        output = err
-    }
-    console.log(output)
+    return (async () => {
+        return commands.sudo[argv[0]].execute(argv, '[console]', null, null)
+    })()
+        .catch(err => err)
+        .then(console.log)
 })
 
 /**
