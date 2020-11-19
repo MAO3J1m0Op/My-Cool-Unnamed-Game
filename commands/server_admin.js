@@ -129,5 +129,34 @@ module.exports = {
             .then(() => dat.channels.signups = signups.id)
 
         return `All set! Go sign up for the next season on <#${signups.id}>!`
+    }),
+
+    /**
+     * Disposes of the assets created for a season.
+     */
+    dispose: new Command(async function(argv, sender, guild, channel) {
+
+        switch (argv[1]) {
+            case 'delete':
+                try {
+                    var dat = await data.get()
+                } catch (err) {
+                    return 'Cannot fetch season data.'
+                }
+
+                // Delete the signups channel
+                let signupP = 
+                    guild.channels.cache.get(dat.channels.signups).delete()
+                let parentP =
+                    guild.channels.cache.get(dat.channels.parent).delete()
+                let mapP =
+                    guild.channels.cache.get(dat.channels.map).delete()
+                let roleP =
+                    guild.roles.cache.get(dat.playerRole).delete()
+                await Promise.all([signupP, parentP, mapP, roleP])
+                return 'All season assets have been deleted.'
+            default:
+                return 'Please specify a valid way of disposing of assets.'
+        }
     })
 }
