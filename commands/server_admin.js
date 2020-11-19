@@ -25,6 +25,16 @@ module.exports = {
             return 'Please supply a category name.'
         }
 
+        let mapSizeX = parseInt(argv[2])
+        if (isNaN(mapSizeX)) {
+            return 'X value for map size is invalid.'
+        }
+
+        let mapSizeY = parseInt(argv[3])
+        if (isNaN(mapSizeY)) {
+            return 'Y value for map size is invalid.'
+        }
+
         // Start category creation
         let pCategory = guild.channels.create(category_name, { 
             type: 'category', 
@@ -94,7 +104,7 @@ module.exports = {
         mapChannelP.then(mapChannel => dat.channels.map = mapChannel.id)
 
         // Create the map
-        let mapGeneratorP = GameMap.generateMap(50, 50)
+        let mapGeneratorP = GameMap.generateMap(mapSizeX, mapSizeY)
         mapGeneratorP.then(mp => dat.map = mp)
 
         // Wait for both the channel and the map to generate
