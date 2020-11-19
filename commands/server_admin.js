@@ -91,6 +91,7 @@ module.exports = {
         // Create the map's residence channel
         let mapChannelP = guild.channels.create('map')
             .then(mapChannel => mapChannel.setParent(category))
+            .then(mapChannel => dat.channels.map = mapChannel.id)
 
         // Create the map
         let mapGeneratorP = GameMap.generateMap(50, 50)

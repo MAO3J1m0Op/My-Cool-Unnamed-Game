@@ -117,13 +117,16 @@ class SeasonData {
      * @param {string} parentCategory 
      * @param {string} channelSignups
      * @param {string} playerRole
+     * @param {string} mapChannel
      */
-    constructor(map = new GameMap(), parentCategory, channelSignups, playerRole) {
+    constructor(map = new GameMap(), parentCategory, channelSignups, playerRole,
+        mapChannel) {
         this.map = map
         this.playerRole = playerRole
         this.channels = {
             parent: parentCategory,
             signups: channelSignups,
+            map: mapChannel,
         }
     }
 }
