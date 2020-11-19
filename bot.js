@@ -2,6 +2,7 @@ const discord = require('discord.js')
 
 const commands = require('./commands.js')
 const data = require('./data.js')
+const util = require('./util.js')
 
 const bot = new discord.Client();
 bot.login(data.settings.authToken).catch(err => {
@@ -161,7 +162,7 @@ async function reply(ioObj) {
     // Just an indication that the command was done.
     if (!io || !io.output) return
 
-    return replyFailNice(io.input, io.output)
+    return util.chunkMessage(io.output, replyFailNice.bind(null, io.input))
 }
 
 // Parses sudo commands entered through console

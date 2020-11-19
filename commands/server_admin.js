@@ -1,6 +1,7 @@
 const Command = require('./Command.js')
 const data = require('../data.js')
 const GameMap = require('../map.js')
+const util = require('../util.js')
 
 /**
  * The commands that only an administrator of a Discord server can execute.
@@ -112,9 +113,11 @@ module.exports = {
         Promise.all([mapChannelP, mapGeneratorP]).then(promises => {
             let channel = promises[0]
             let mp = promises[1]
-            channel.send(mp.render())
+
+            // If any error happens, all the following promises reject.
+            util.chunkMessage(mp.render(), content => channel.send(content))
                 .catch(err => {
-                    console.error("Unable to send map.")
+                    console.error("Unable to fully send map.")
                     console.error(err)
                     channel.send('[ Error in sending map ]')
 
