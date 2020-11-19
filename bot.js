@@ -130,6 +130,24 @@ async function passToCommand(msg, command, argv) {
 }
 
 /**
+ * Wraps `discord.Message.reply` with error handling.
+ * @param {discord.Message} msg the message object to call `reply` on.
+ * @param {string} content the content to pass to `msg.reply`.
+ */
+async function replyFailNice(msg, content) {
+    try {
+        return msg.reply(content);
+    } catch (err) {
+        console.error(err);
+        console.error('Offending message: "' + content + '"');
+        msg.reply('The command was executed, '
+            + 'but there was an error sending the message.')
+            // Twice? Seriously?
+            .catch(console.error);
+    }
+}
+
+/**
  * Replies to a given message.
  * @param {Promise<{ input: discord.Message, output: string }>} ioObj the message to reply to and
  * the command output (or other string) to send to reply to the given message.
@@ -143,12 +161,7 @@ async function reply(ioObj) {
     // Just an indication that the command was done.
     if (!io || !io.output) return
 
-    io.input.reply(io.output).catch(err => {
-        console.error(err)
-        console.error('Offending message: "' + io.output + '"')
-        io.input.reply('The command was executed, '
-            + 'but there was an error sending the message.')
-    })
+    return replyFailNice(io.input, io.output)
 }
 
 // Parses sudo commands entered through console
