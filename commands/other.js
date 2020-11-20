@@ -22,7 +22,7 @@ module.exports = {
 
         const x = parseInt(numbers[0])
         const y = parseInt(numbers[1])
-        if (x === NaN || y === NaN) return badSyntax
+        if (isNaN(x) || isNaN(y)) return badSyntax
 
         try {
             var dat = await data.get()
