@@ -34,8 +34,8 @@ module.exports = {
         if (dat.map.assignCapital(sender.id, x, y)) {
 
             // Add them to role
-            let role = await guild.roles.fetch(dat.playerRole)
-            (await guild.members.fetch(sender.id)).roles.add(role)
+            let role = guild.roles.cache.get(dat.playerRole)
+            guild.members.cache.get(sender.id).roles.add(role)
             return "You're in!"
         } else {
             return 'Your capital is in an invalid spot. Try a different spot.'
