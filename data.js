@@ -230,8 +230,9 @@ module.exports.reload = async function(noFiles = false) {
     // asked for while we're reloading.
     dataBlockingPromise = reloadPrivate(noFiles)
     return dataBlockingPromise.catch(err => {
-        console.error('An error occurred reloading data: ' + err)
-        console.error('Restart the bot to try again.')
+        console.error('An error occurred reloading data.')
+        console.error(err)
+        console.error('Fix the problem, then run the command ##reload.')
     })
 }
 
