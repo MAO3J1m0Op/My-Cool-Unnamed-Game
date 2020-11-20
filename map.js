@@ -78,6 +78,8 @@ class GameMap {
         // Gets the length of the y
         
         // Bounds checks
+        if (this.arr[x] === undefined ||
+            this.arr[x][y] === undefined) return false
         const lowX = Math.max(x - distance, 0)
         const hiX = Math.min(x + distance + 1, this.lengthX())
         const lowY = Math.max(y - distance, 0)
