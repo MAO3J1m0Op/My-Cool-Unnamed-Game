@@ -118,9 +118,10 @@ class SeasonData {
      * @param {string} channelSignups
      * @param {string} playerRole
      * @param {string} mapChannel
+     * @param {string} name
      */
     constructor(map = new GameMap(), parentCategory, channelSignups, playerRole,
-        mapChannel) {
+        mapChannel, name) {
         this.map = map
         this.playerRole = playerRole
         this.channels = {
@@ -128,6 +129,7 @@ class SeasonData {
             signups: channelSignups,
             map: mapChannel,
         }
+        this.name = name
     }
 }
 

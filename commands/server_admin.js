@@ -128,6 +128,9 @@ module.exports = {
         signups.setParent(category)
             .then(() => dat.channels.signups = signups.id)
 
+        // Save the name of the season
+        dat.name = category_name
+
         return `All set! Go sign up for the next season on <#${signups.id}>!`
     }),
 
