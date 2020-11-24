@@ -58,7 +58,7 @@ class GameMap {
     render() {
         return this.arr.reduce((x0, x) => {
             return x0 + x.reduce((y0, y) => {
-                return y0 + '\\' + y.biome.emoji
+                return y0 + ':' + y.biome.emoji + ':'
             }, '') + '\n'
         }, '')
     }
@@ -116,8 +116,8 @@ module.exports.GridSquare = GridSquare
 module.exports.Biome = Biome
 
 module.exports.biomes = {
-    forest: new Biome('forest', '\\:green_square:'),
-    desert: new Biome('desert', '\\:yellow_square:')
+    forest: new Biome('forest', 'green_square'),
+    desert: new Biome('desert', 'yellow_square')
 }
 
 /**
