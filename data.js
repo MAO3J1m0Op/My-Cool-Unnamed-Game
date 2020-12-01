@@ -2,6 +2,7 @@ const fs = require('fs').promises
 const discord = require('discord.js')
 
 const GameMap = require('./map.js')
+const SeasonManager = require('./season_manager.js')
 
 /**
  * Creates a folder, or does nothing if the folder already exists.
@@ -50,8 +51,8 @@ const DEFAULT_SETTINGS = {
     dataSaveIntervalMins: 3,
     // The path to the data folder (with trailing slash)
     dataPathRoot: './data/',
-    // The name of the map file name
-    dataMapFileName: 'map.json',
+    // The name of the map folder name (with trailing slash)
+    dataMapFileName: 'maps/',
     // The name of the data file name
     dataFileName: 'data.json',
     // Bot authtoken
@@ -111,29 +112,12 @@ module.exports.settings.write = function() {
 
 module.exports.settings.write()
 
-class SeasonData {
-    /**
-     * @param {GameMap} map 
-     * @param {string} parentCategory 
-     * @param {string} channelSignups
-     * @param {string} playerRole
-     * @param {string} mapChannel
-     * @param {string} name
-     */
-    constructor(map = new GameMap(), parentCategory, channelSignups, playerRole,
-        mapChannel, name) {
-        this.map = map
-        this.playerRole = playerRole
-        this.channels = {
-            parent: parentCategory,
-            signups: channelSignups,
-            map: mapChannel,
-        }
-        this.name = name
-    }
-}
+/**
+ * All of the read-in data
+ * @type {{[season: string]: SeasonManager}}
+ */
+var data = {}
 
-var data = new SeasonData()
 /**
  * This promise is waited on when any operation involving data is called.
  * This is to ensure that data is not being given when there isn't anything
@@ -147,33 +131,39 @@ const dataPath = module.exports.settings.dataPathRoot
     + module.exports.settings.dataFileName
 
 /**
- * Writes data.map to file.
+ * Saves all maps.
  */
 async function saveMap() {
-    let dat
+    let promises = []
     try {
-        dat = (await module.exports.get()).map.arr
-    } catch (err) { return } // Do nothing if the data is broken
-    return writeJSON(mapPath, dat)
+        for (const season in data) {
+            let map = (await module.exports.get(season)).mapToJSON()
+            let p = writeJSON(mapPath + season + '.json', map)
+            p.then(() => console.log(`Map for ${season} written to file.`))
+            promises.push(p)
+        }
+        return Promise.all(promises)
+            .then(() => console.log(`All maps written to file.`))
+    } catch (err) {
+        console.error('Maps could not be saved.')
+        console.error(err)
+    }
 }
 
 /**
  * Writes all data (excluding the map) to file.
  */
 async function saveData() {
-    let datCopy = {}
-    let dat
     try {
-        dat = await module.exports.get()
-    } catch (err) { return } // Do nothing if the data is broken
-
-    // Make a shallow copy
-    for (const key in dat) {
-        if (key === 'map') continue // Skip the map object
-        datCopy[key] = dat[key]
+        let saveObj = {}
+        for (const season in data) {
+            saveObj[season] = (await module.exports.get(season)).dataToJSON()
+        }
+        return writeJSON(dataPath, saveObj)
+    } catch (err) {
+        console.error('Data could not be saved.')
+        console.error(err)
     }
-
-    return writeJSON(dataPath, datCopy)
 }
 
 /**
@@ -206,7 +196,7 @@ module.exports.close = async function() {
 async function reloadPrivate(noFiles = false) {
 
     if (noFiles) {
-        data = new SeasonData()
+        data = {}
         console.log('Data files have been ignored. Using default values.')
         return
     }
@@ -216,10 +206,32 @@ async function reloadPrivate(noFiles = false) {
 
     // Use a dummy variable so it can be discarded if a reload fails.
     let dummyData = await readJSON(dataPath)
-    if (Object.keys(dummyData).length === 0) dummyData = new SeasonData()
-    let mapArr = (await readJSON(mapPath))
-        .map(subArr => subArr.map(entry => GameMap.GridSquare.fromObj(entry)))
-    dummyData.map = new GameMap(mapArr)
+
+    // Read in map
+    makeFolder(mapPath)
+    let mapFiles = await fs.readdir(mapPath)
+    
+    // Read in each file
+    // Use map instead of foreach to get array of promises
+    let mapContents = mapFiles.map(file => {
+        let promise
+        if (!file.endsWith('.json')) promise = Promise.resolve()
+        promise = readJSON(file).then(map => 
+            map.map(subArr => subArr.map(entry => GameMap.GridSquare.fromObj(entry))))
+            return {
+                // Cuts the .json file extension
+                file: file.substr(0, file.length - 5), 
+                promise: promise 
+            }
+    })
+
+    // Add maps to dummyDatas
+    mapContents.forEach(map => {
+        map.promise.then(contents => dummyData[map.file] = contents)
+    })
+    // Wait for all above promises to resolve
+    await Promise.all(mapContents.map(map => map.promise))
+
     data = dummyData
 }
 
@@ -246,11 +258,22 @@ module.exports.reload()
 /**
  * Gets the data object. This function returns a promise in case data is
  * asked for before the request can be properly managed.
- * @returns {Promise<SeasonData>} a promise to the data.
+ * @param {string} name the name of the season.
+ * @returns {Promise<SeasonManager>} a promise to the data.
  */
-module.exports.get = async function() {
+module.exports.get = async function(name) {
     await dataBlockingPromise
-    return data
+    return data[name]
+}
+
+/**
+ * Makes a new season, overwriting any existing season of the same name.
+ * @param {discord.Guild}
+ * @param {SeasonManager} season the manager of the new season.
+ */
+module.exports.add = async function(season) {
+    await dataBlockingPromise
+    data[season.name] = season
 }
 
 /**
