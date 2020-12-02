@@ -142,8 +142,7 @@ async function saveMap() {
             p.then(() => console.log(`Map for ${season} written to file.`))
             promises.push(p)
         }
-        return Promise.all(promises)
-            .then(() => console.log(`All maps written to file.`))
+        await Promise.all(promises)
     } catch (err) {
         console.error('Maps could not be saved.')
         console.error(err)
@@ -171,7 +170,7 @@ async function saveData() {
  */
 module.exports.save = async function() {
     let dat = saveData().then(() => console.log('Data written to file ' + dataPath))
-    let mp = saveMap().then(() => console.log('Map written to file ' + mapPath))
+    let mp = saveMap().then(() => console.log('All maps written to file.'))
     await Promise.all([dat, mp])
 }
 
