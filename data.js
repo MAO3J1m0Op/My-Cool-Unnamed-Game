@@ -199,7 +199,14 @@ async function reloadPrivate(noFiles = false) {
     let seasonContents = seasonFiles.map(file => {
         let promise
         if (!file.endsWith('.json')) promise = Promise.resolve()
-        promise = readJSON(file).then(SeasonManager.fromObj)
+        else promise = readJSON(module.exports.settings.dataPathRoot + file)
+            .then(SeasonManager.fromObj, err => {
+                console.error(`INVALID JSON: Could not read the contents of ${file}.`)
+            })
+            .catch(err => {
+                console.error(`${file} is incomplete.`)
+                console.error(err)
+            })
         return {
             // Cuts the .json file extension
             file: file.substr(0, file.length - 5), 
