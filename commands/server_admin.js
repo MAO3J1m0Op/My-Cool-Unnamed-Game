@@ -58,17 +58,13 @@ module.exports = {
     /**
      * Disposes of the assets created for a season.
      */
-    dispose: new Command(async function(argv, sender, guild, channel) {
-
-        switch (argv[1]) {
-            case 'delete':
-                try {
-                    await (await data.get(argv[2])).delete()
-                    return `Season ${argv[2]} deleted.`
-                } catch (err) {
-                    console.error(err)
-                    return 'Cannot fetch season data.'
-                }
+    delete: new Command(async function(argv, sender, guild, channel) {
+        try {
+            await (await data.get(argv[1])).delete()
+            return `Season ${argv[1]} deleted.`
+        } catch (err) {
+            console.error(err)
+            return 'Cannot fetch season data.'
         }
     })
 }
