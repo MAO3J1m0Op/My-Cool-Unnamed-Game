@@ -206,6 +206,11 @@ async function reloadPrivate(noFiles = false) {
     // Use a dummy variable so it can be discarded if a reload fails.
     let dummyData = await readJSON(dataPath)
 
+    // Convert JSON objects to real SeasonManagers
+    for (const season in dummyData) {
+        dummyData[season] = SeasonManager.fromObj(dummyData[season])
+    }
+
     // Read in map
     makeFolder(mapPath)
     let mapFiles = await fs.readdir(mapPath)
@@ -226,7 +231,7 @@ async function reloadPrivate(noFiles = false) {
 
     // Add maps to dummyDatas
     mapContents.forEach(map => {
-        map.promise.then(contents => dummyData[map.file] = contents)
+        map.promise.then(contents => dummyData[map.file] = new GameMap(contents))
     })
     // Wait for all above promises to resolve
     await Promise.all(mapContents.map(map => map.promise))
