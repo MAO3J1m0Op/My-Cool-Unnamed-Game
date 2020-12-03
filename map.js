@@ -17,6 +17,16 @@ class GridSquare {
     get biome() {
         return module.exports.biomes[this._biome]
     }
+
+    /**
+     * @returns an object representing this object in a JSON-friendly format.
+     */
+    toJSON() {
+        return {
+            biome: this._biome,
+            capital: this.capital
+        }
+    }
 }
 
 /**
@@ -94,6 +104,13 @@ class GameMap {
             this.arr[x][y].capital = player
             return true
         } else return false
+    }
+
+    /**
+     * @returns an object representing this object in a JSON-friendly format.
+     */
+    toJSON() {
+        return this.arr.map(subArr => subArr.map(e => e.toJSON()))
     }
 }
 
