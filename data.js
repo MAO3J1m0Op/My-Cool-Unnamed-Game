@@ -271,6 +271,17 @@ module.exports.get = async function(name) {
 }
 
 /**
+ * @returns {Promise<{[season: string]: SeasonManager}>} an object containing
+ * all of the SeasonManagers currently read in.
+ */
+module.exports.getAll = async function() {
+    await dataBlockingPromise
+    const datCopy = {}
+    for (const season in data) datCopy[season] = data[season]
+    return datCopy
+}
+
+/**
  * Makes a new season, overwriting any existing season of the same name.
  * @param {discord.Guild}
  * @param {SeasonManager} season the manager of the new season.
