@@ -274,16 +274,3 @@ module.exports.add = async function(season) {
     await dataBlockingPromise
     data[season.name] = season
 }
-
-/**
- * Sets the key of the data object to the current value. Synonymous to
- * <pre><code>
- * get().then(data => data[key] = value)
- * </code></pre>
- * @param {string} key 
- * @param {*} value 
- * @returns {Promise<void>}
- */
-module.exports.set = function(key, value) {
-    return module.exports.get().then(data => data[key] = value)
-}
