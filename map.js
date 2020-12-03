@@ -3,10 +3,10 @@ const random = require('./random')
 class GridSquare {
     /**
      * @param {string} biome the name of the biome of this square.
-     * @param {string | null} capital the player whose capital is this square
-     * (or null if there is no capital).
+     * @param {string} capital the player whose capital is this square
+     * (or undefined if there is no capital).
      */
-    constructor(biome, capital = null) {
+    constructor(biome, capital) {
         this._biome = biome
         this.capital = capital
     }
