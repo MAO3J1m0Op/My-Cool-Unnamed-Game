@@ -133,34 +133,21 @@ const dataPath = module.exports.settings.dataPathRoot
 /**
  * Saves all maps.
  */
-async function saveMap() {
+async function saveSeasons() {
     let promises = []
     try {
-        for (const season in data) {
-            let map = (await module.exports.get(season)).mapToJSON()
-            let p = writeJSON(mapPath + season + '.json', map)
-            p.then(() => console.log(`Map for ${season} written to file.`))
+        const dat = await module.exports.getAll()
+        for (const season in dat) {
+            if (dat[season] === undefined) continue
+            let seasonDat = dat[season].toJSON()
+            let p = writeJSON(module.exports.settings.dataPathRoot
+                + season + '.json', seasonDat)
+            p.then(() => console.log(`${season} written to file.`))
             promises.push(p)
         }
         await Promise.all(promises)
     } catch (err) {
-        console.error('Maps could not be saved.')
-        console.error(err)
-    }
-}
-
-/**
- * Writes all data (excluding the map) to file.
- */
-async function saveData() {
-    try {
-        let saveObj = {}
-        for (const season in data) {
-            saveObj[season] = (await module.exports.get(season)).dataToJSON()
-        }
-        return writeJSON(dataPath, saveObj)
-    } catch (err) {
-        console.error('Data could not be saved.')
+        console.error('Seasons could not be saved.')
         console.error(err)
     }
 }
@@ -169,9 +156,8 @@ async function saveData() {
  * Saves both data and map.
  */
 module.exports.save = async function() {
-    let dat = saveData().then(() => console.log('Data written to file ' + dataPath))
-    let mp = saveMap().then(() => console.log('All maps written to file.'))
-    await Promise.all([dat, mp])
+    let dat = saveSeasons().then(() => console.log('All seasons written to file.'))
+    await Promise.all([dat])
 }
 
 // Starts save on an interval
@@ -193,7 +179,7 @@ module.exports.close = async function() {
  * values loaded in.
  */
 async function reloadPrivate(noFiles = false) {
-
+    
     if (noFiles) {
         data = {}
         console.log('Data files have been ignored. Using default values.')
@@ -203,38 +189,33 @@ async function reloadPrivate(noFiles = false) {
     // Ensures the enclosing folder exists.
     makeFolder(module.exports.settings.dataPathRoot)
 
-    // Use a dummy variable so it can be discarded if a reload fails.
-    let dummyData = await readJSON(dataPath)
-
-    // Convert JSON objects to real SeasonManagers
-    for (const season in dummyData) {
-        dummyData[season] = SeasonManager.fromObj(dummyData[season])
-    }
+    let dummyData = {}
 
     // Read in map
-    makeFolder(mapPath)
-    let mapFiles = await fs.readdir(mapPath)
+    let seasonFiles = await fs.readdir(module.exports.settings.dataPathRoot)
     
     // Read in each file
     // Use map instead of foreach to get array of promises
-    let mapContents = mapFiles.map(file => {
+    let seasonContents = seasonFiles.map(file => {
         let promise
         if (!file.endsWith('.json')) promise = Promise.resolve()
-        promise = readJSON(file).then(map => 
-            map.map(subArr => subArr.map(entry => GameMap.GridSquare.fromObj(entry))))
-            return {
-                // Cuts the .json file extension
-                file: file.substr(0, file.length - 5), 
-                promise: promise 
-            }
+        promise = readJSON(file).then(SeasonManager.fromObj)
+        return {
+            // Cuts the .json file extension
+            file: file.substr(0, file.length - 5), 
+            promise: promise 
+        }
     })
 
     // Add maps to dummyDatas
-    mapContents.forEach(map => {
-        map.promise.then(contents => dummyData[map.file] = new GameMap(contents))
+    seasonContents.forEach(season => {
+        season.promise.then(contents => {
+            if (contents === undefined) return
+            dummyData[season.file] = contents
+        })
     })
     // Wait for all above promises to resolve
-    await Promise.all(mapContents.map(map => map.promise))
+    await Promise.all(seasonContents.map(s => s.promise))
 
     data = dummyData
 }

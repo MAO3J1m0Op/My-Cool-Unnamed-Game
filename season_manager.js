@@ -174,31 +174,26 @@ class SeasonManager {
      * @property {{[channel_name: string]: string}} channels the IDs of the
      * other channels.
      * @property {string} role the ID of the role.
+     * @property {any[][]} map the serialized map.
      */
     
     /**
      * @returns {SeasonManagerJSONObj} an object that is saved as data in a
      * JSON-friendly format.
      */
-    dataToJSON() {
+    toJSON() {
         const json = {
             guild: this.guild.id,
             name: this.name,
             parentChannel: this.parentChannel.channel.id,
             role: this.role.channel.id,
             channels: {},
+            map: this.map.arr
         }
         for (const channel in this.channels) {
             json.channels[channel] = this.channels[channel].id
         }
         return json
-    }
-
-    /**
-     * @returns the map in a JSON-friendly format.
-     */
-    mapToJSON() {
-        return this.map.toJSON()
     }
 
     /**
@@ -213,6 +208,8 @@ class SeasonManager {
             val.channels[channel].initialize(obj.channels[channel])
         }
         val.role.initialize(obj.role)
+        val.map = new GameMap(obj.map
+            .map(subArr => subArr.map(entry => GameMap.GridSquare.fromObj(entry))))
         return val
     }
 }
