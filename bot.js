@@ -11,9 +11,28 @@ bot.login(data.settings.authToken).catch(err => {
     close()
 })
 
-bot.on('ready', () => {
-    console.log("The bot is now active.")
+const loggedIn = new Promise((resolve) => {
+    bot.on('ready', () => {
+        console.log("The bot is now active.")
+        resolve()
+    })
 })
+
+/**
+ * @return a promise that resolves once the bot logs in.
+ */
+module.exports.loggedIn = function() {
+    return loggedIn
+}
+
+/**
+ * Gets a Guild object by ID.
+ * @param {string} id the ID of the guild
+ */
+module.exports.getGuild = async function(id) {
+    await module.exports.loggedIn()
+    return bot.guilds.cache.get(id)
+}
 
 bot.on('message', msg => {
 

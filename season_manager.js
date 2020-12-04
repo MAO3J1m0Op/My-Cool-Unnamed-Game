@@ -1,6 +1,7 @@
 const discord = require('discord.js')
 const util = require('./util.js')
 const GameMap = require('./map.js')
+const bot = require('./bot.js')
 
 /**
  * Manages a specific Discord asset as a part of a SeasonManager.
@@ -200,8 +201,8 @@ class SeasonManager {
      * Builds a proper SeasonManager from a JSON-friendly object.
      * @param {SeasonManagerJSONObj} obj the object to build the instance from.
      */
-    static fromObj(obj) {
-        const val = new SeasonManager(obj.guild, obj.name)
+    static async fromObj(obj) {
+        const val = new SeasonManager(await bot.getGuild(obj.guild), obj.name)
         val.parentChannel.initialize(obj.parentChannel)
         for (const channel in val.channels) {
             if (obj.channels[channel] === undefined) continue
