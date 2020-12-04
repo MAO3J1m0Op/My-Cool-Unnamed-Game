@@ -60,7 +60,7 @@ module.exports = {
      */
     delete: new Command(async function(argv, sender, guild, channel) {
         try {
-            await (await data.get(argv[1])).delete()
+            await (await data.get(argv[1], guild)).delete()
             return `Season ${argv[1]} deleted.`
         } catch (err) {
             console.error(err)

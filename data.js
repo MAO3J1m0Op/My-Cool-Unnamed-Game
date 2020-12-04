@@ -1,7 +1,6 @@
 const fs = require('fs').promises
 const discord = require('discord.js')
 
-const GameMap = require('./map.js')
 const SeasonManager = require('./season_manager.js')
 
 /**
@@ -198,7 +197,9 @@ async function reloadPrivate(noFiles = false) {
     // Use map instead of foreach to get array of promises
     let seasonContents = seasonFiles.map(file => {
         let promise
-        if (!file.endsWith('.json')) promise = Promise.resolve()
+        
+        if (!file.match(/(?<guild>\d+):(?<name>.+)\.json/))
+            promise = Promise.resolve()
         else promise = readJSON(module.exports.settings.dataPathRoot + file)
             .then(SeasonManager.fromObj, err => {
                 console.error(`INVALID JSON: Could not read the contents of ${file}.`)
@@ -249,13 +250,17 @@ module.exports.reload()
 
 /**
  * Gets the data object. This function returns a promise in case data is
- * asked for before the request can be properly managed.
+ * asked for before the request can be properly managed. If guild is undefined,
+ * name should be in the format guild ID:season name. Otherwise, only the season
+ * name is necessary.
  * @param {string} name the name of the season.
+ * @param {discord.Guild} guild the guild that the season belongs to.
  * @returns {Promise<SeasonManager>} a promise to the data.
  */
-module.exports.get = async function(name) {
+module.exports.get = async function(name, guild) {
     await dataBlockingPromise
-    return data[name]
+    if (guild) return data[guild.id + ':' + name]
+    else return data[name]
 }
 
 /**
@@ -276,5 +281,5 @@ module.exports.getAll = async function() {
  */
 module.exports.add = async function(season) {
     await dataBlockingPromise
-    data[season.name] = season
+    data[season.guild.id + ':' + season.name] = season
 }
