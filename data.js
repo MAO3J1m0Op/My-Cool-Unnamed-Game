@@ -41,6 +41,15 @@ async function readJSON(path) {
 }
 
 /**
+ * Deletes a file.
+ * @param {string} path the path to the file.
+ */
+async function deleteFile(path) {
+    // Move to my desktop because I'm a scaredy cat.
+    // return fs.rm(path)
+}
+
+/**
  * The default contents of the settings file.
  */
 const DEFAULT_SETTINGS = {
@@ -117,6 +126,8 @@ module.exports.settings.write()
  */
 var data = {}
 
+const SEASON_KEY_REGEX = /(?<guild>\d+):(?<name>.+)\.json/
+
 /**
  * This promise is waited on when any operation involving data is called.
  * This is to ensure that data is not being given when there isn't anything
@@ -133,6 +144,12 @@ const dataPath = module.exports.settings.dataPathRoot
  * Saves all maps.
  */
 async function saveSeasons() {
+
+    // Get all the data files in existence
+    const files = (await fs.readdir(module.exports.settings.dataPathRoot))
+        .filter(file => file.match(SEASON_KEY_REGEX))
+        .map(file => file.substring(0, file.length - 5))
+
     let promises = []
     try {
         const dat = await module.exports.getAll()
@@ -145,6 +162,21 @@ async function saveSeasons() {
             promises.push(p)
         }
         await Promise.all(promises)
+
+        // Check each file for a dat entry
+        for (let i = 0; i < files.length; ++i) {
+            const file = files[i]
+            if (dat[file] === undefined) {
+                deleteFile(module.exports.settings.dataPathRoot + file)
+                    .then(console.log(`${file} deleted,`
+                        + ' as the season no longer exists.'),
+                    err => {
+                        console.error(err)
+                        console.log(`Error in deleting ${file}.`)
+                    })
+            }
+        }
+
     } catch (err) {
         console.error('Seasons could not be saved.')
         console.error(err)
@@ -198,7 +230,7 @@ async function reloadPrivate(noFiles = false) {
     let seasonContents = seasonFiles.map(file => {
         let promise
         
-        if (!file.match(/(?<guild>\d+):(?<name>.+)\.json/))
+        if (!file.match(SEASON_KEY_REGEX))
             promise = Promise.resolve()
         else promise = readJSON(module.exports.settings.dataPathRoot + file)
             .then(SeasonManager.fromObj, err => {
