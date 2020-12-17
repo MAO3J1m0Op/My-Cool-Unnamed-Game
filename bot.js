@@ -70,17 +70,26 @@ bot.on('message', msg => {
 })
 
 /**
+ * A function called to verify that all the conditions required to execute a
+ * given command have been met. If the function's promise resolves, then
+ * the conditions have been met. A rejected promise indicates the verification
+ * was not met, the reason indicating why the verification failed.
+ * @callback VerificationFunction
+ * @param {discord.User} sender the user that send the message.
+ * @param {discord.Guild} guild the guild in which the message was sent.
+ * @param {discord.Channel} channel the channel on which the message was sent.
+ * @returns {Promise<void>} resolves if the verification succeeded, and
+ * rejects if the verification fails.
+ */
+
+/**
  * Checks if a given message is a command, then runs the command requested.
  * @param {discord.Message} msg the message sent that must be checked for 
  * as a command.
  * @param {string} denoter the text used to verify that the text sent is
  * a command.
  * @param {{[command: string]: commands.Command}} command_obj the object containing the command lookup.
- * @param {(
- *   sender: discord.User, 
- *   guild: discord.Guild,
- *   channel: discord.Channel
- * ) => Promise<void>} verification a function called to verify all the conditions
+ * @param {VerificationFunction} verification a function called to verify all the conditions
  * required to execute a given type of command. If the function executes 
  * successfully, then the command will be run. If the function throws an
  * error, the error will be printed and the command ignored. If the error 
